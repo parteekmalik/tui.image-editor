@@ -37,6 +37,9 @@ export default ({ locale, makeSvgIcon }) => `
             <label class="range">${locale.localize('Range')}</label>
             <div class="tie-draw-range"></div>
             <input class="tie-draw-range-value tui-image-editor-range-value" value="0" />
+            <label class="range">${locale.localize('Opacity')}</label>
+            <div class="tie-draw-opacity-range"></div>
+            <input class="tie-draw-opacity-range-value tui-image-editor-range-value" value="0" />
         </li>
     </ul>
 `;

@@ -3,9 +3,12 @@ import Range from '@/ui/tools/range';
 import Submenu from '@/ui/submenuBase';
 import templateHtml from '@/ui/template/submenu/draw';
 import { assignmentForDestroy, getRgb } from '@/util';
-import { defaultDrawRangeValues, eventNames, selectorNames } from '@/consts';
-
-const DRAW_OPACITY = 0.7;
+import {
+  defaultDrawRangeValues,
+  defaultDrawOpacityValues,
+  eventNames,
+  selectorNames,
+} from '@/consts';
 
 /**
  * Draw ui class
@@ -37,11 +40,19 @@ class Draw extends Submenu {
         },
         defaultDrawRangeValues
       ),
+      drawOpacity: new Range(
+        {
+          slider: this.selector('.tie-draw-opacity-range'),
+          input: this.selector('.tie-draw-opacity-range-value'),
+        },
+        defaultDrawOpacityValues
+      ),
     };
 
     this.type = null;
     this.color = this._els.drawColorPicker.color;
     this.width = this._els.drawRange.value;
+    this.opacity = this._els.drawOpacity.value;
 
     this.colorPickerInputBox = this._els.drawColorPicker.colorpickerElement.querySelector(
       selectorNames.COLOR_PICKER_INPUT_BOX
@@ -55,6 +66,7 @@ class Draw extends Submenu {
     this._removeEvent();
     this._els.drawColorPicker.destroy();
     this._els.drawRange.destroy();
+    this._els.drawOpacity.destroy();
 
     assignmentForDestroy(this);
   }
@@ -71,6 +83,7 @@ class Draw extends Submenu {
     this._els.lineSelectButton.addEventListener('click', this.eventHandler.changeDrawType);
     this._els.drawColorPicker.on('change', this._changeDrawColor.bind(this));
     this._els.drawRange.on('change', this._changeDrawRange.bind(this));
+    this._els.drawOpacity.on('change', this._changeDrawOpacity.bind(this));
 
     this.colorPickerInputBox.addEventListener(
       eventNames.FOCUS,
@@ -90,6 +103,7 @@ class Draw extends Submenu {
     this._els.lineSelectButton.removeEventListener('click', this.eventHandler.changeDrawType);
     this._els.drawColorPicker.off();
     this._els.drawRange.off();
+    this._els.drawOpacity.off();
 
     this.colorPickerInputBox.removeEventListener(
       eventNames.FOCUS,
@@ -107,7 +121,7 @@ class Draw extends Submenu {
   setDrawMode() {
     this.actions.setDrawMode(this.type, {
       width: this.width,
-      color: getRgb(this.color, DRAW_OPACITY),
+      color: getRgb(this.color, this.opacity),
     });
   }
 
@@ -176,6 +190,20 @@ class Draw extends Submenu {
    */
   _changeDrawRange(value) {
     this.width = value;
+    if (!this.type) {
+      this.changeStartMode();
+    } else {
+      this.setDrawMode();
+    }
+  }
+
+  /**
+   * Change drawing Opacity
+   * @param {number} value - select drawing range
+   * @private
+   */
+  _changeDrawOpacity(value) {
+    this.opacity = value;
     if (!this.type) {
       this.changeStartMode();
     } else {
