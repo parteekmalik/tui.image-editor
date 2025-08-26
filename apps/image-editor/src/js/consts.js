@@ -381,6 +381,13 @@ export const defaultFilterRangeValues = {
     max: 1000,
     value: 100,
   },
+  sharpenRange: {
+    realTimeEvent: true,
+    min: 3,
+    max: 9,
+    value: 5,
+    useDecimal: true,
+  },
   pixelateRange: {
     realTimeEvent: true,
     min: 2,
