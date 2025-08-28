@@ -38,6 +38,12 @@ export default ({ locale }) => `
                 </div>
                 <div class="tui-image-editor-checkbox">
                     <label>
+                        <input type="checkbox" class="tie-sharpen">
+                        <span>${locale.localize('Sharpen')}</span>
+                    </label>
+                </div>
+                <div class="tui-image-editor-checkbox">
+                    <label>
                         <input type="checkbox" class="tie-emboss">
                         <span>${locale.localize('Emboss')}</span>
                     </label>
@@ -112,17 +118,6 @@ export default ({ locale }) => `
                 <div class="tui-image-editor-newline tui-image-editor-range-wrap short">
                     <label>${locale.localize('Threshold')}</label>
                     <div class="tie-colorfilter-threshold-range"></div>
-                </div>
-            </div>
-            <div class="tui-image-editor-checkbox-group tui-image-editor-disabled">
-                <div class="tui-image-editor-checkbox">
-                    <label>
-                        <input type="checkbox" class="tie-sharpen">
-                        <span>${locale.localize('Sharpen')}</span>
-                    </label>
-                </div>
-                <div class="tui-image-editor-range-wrap short">
-                    <div class="tie-sharpen-range"></div>
                 </div>
             </div>
         </li>

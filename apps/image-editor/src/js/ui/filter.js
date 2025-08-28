@@ -55,7 +55,6 @@ const RANGE_INSTANCE_NAMES = [
   'pixelateRange',
   'noiseRange',
   'brightnessRange',
-  'sharpenRange',
   'tintOpacity',
 ];
 const COLORPICKER_INSTANCE_NAMES = ['filterBlendColor', 'filterMultiplyColor', 'filterTintColor'];
@@ -151,7 +150,6 @@ class Filter extends Submenu {
     });
 
     this._els.removewhiteDistanceRange.on('change', changeFilterStateForRange('removeWhite'));
-    this._els.sharpenRange.on('change', changeFilterStateForRange('sharpen'));
     this._els.colorfilterThresholdRange.on('change', changeFilterStateForRange('colorFilter'));
     this._els.pixelateRange.on('change', changeFilterStateForRange('pixelate'));
     this._els.noiseRange.on('change', changeFilterStateForRange('noise'));
@@ -222,8 +220,6 @@ class Filter extends Submenu {
       this._els.colorfilterThresholdRange.value = options.distance;
     } else if (filterName === 'removeWhite') {
       this._els.removewhiteDistanceRange.value = options.distance;
-    } else if (filterName === 'sharpen') {
-      this._els.sharpenRange.value = options.sharpen;
     } else if (filterName === 'pixelate') {
       this._els.pixelateRange.value = options.blocksize;
     } else if (filterName === 'brightness') {
@@ -303,9 +299,6 @@ class Filter extends Submenu {
         option.color = '#FFFFFF';
         option.distance = parseFloat(this._els.colorfilterThresholdRange.value);
         break;
-      case 'sharpen':
-        option.sharpen = parseFloat(this._els.sharpenRange.value);
-        break;
       case 'pixelate':
         option.blocksize = toInteger(this._els.pixelateRange.value);
         break;
@@ -354,10 +347,6 @@ class Filter extends Submenu {
         FILTER_RANGE.brightnessRange
       ),
       noiseRange: new Range({ slider: this.selector('.tie-noise-range') }, FILTER_RANGE.noiseRange),
-      sharpenRange: new Range(
-        { slider: this.selector('.tie-sharpen-range') },
-        FILTER_RANGE.sharpenRange
-      ),
       pixelateRange: new Range(
         { slider: this.selector('.tie-pixelate-range') },
         FILTER_RANGE.pixelateRange
