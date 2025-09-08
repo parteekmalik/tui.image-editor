@@ -20,6 +20,9 @@ const FILTER_OPTIONS = [
   'emboss',
   'remove-white',
   'brightness',
+  'contrast',
+  'saturation',
+  'gamma',
   'noise',
   'pixelate',
   'color-filter',
@@ -55,6 +58,11 @@ const RANGE_INSTANCE_NAMES = [
   'pixelateRange',
   'noiseRange',
   'brightnessRange',
+  'contrastRange',
+  'saturationRange',
+  'gammaRRange',
+  'gammaGRange',
+  'gammaBRange',
   'tintOpacity',
 ];
 const COLORPICKER_INSTANCE_NAMES = ['filterBlendColor', 'filterMultiplyColor', 'filterTintColor'];
@@ -154,6 +162,11 @@ class Filter extends Submenu {
     this._els.pixelateRange.on('change', changeFilterStateForRange('pixelate'));
     this._els.noiseRange.on('change', changeFilterStateForRange('noise'));
     this._els.brightnessRange.on('change', changeFilterStateForRange('brightness'));
+    this._els.contrastRange.on('change', changeFilterStateForRange('contrast'));
+    this._els.saturationRange.on('change', changeFilterStateForRange('saturation'));
+    this._els.gammaRRange.on('change', changeFilterStateForRange('gamma'));
+    this._els.gammaGRange.on('change', changeFilterStateForRange('gamma'));
+    this._els.gammaBRange.on('change', changeFilterStateForRange('gamma'));
 
     this._els.filterBlendColor.on('change', this.eventHandler.changeBlendFilter);
     this._els.filterMultiplyColor.on('change', changeFilterState('multiply'));
@@ -224,6 +237,14 @@ class Filter extends Submenu {
       this._els.pixelateRange.value = options.blocksize;
     } else if (filterName === 'brightness') {
       this._els.brightnessRange.value = options.brightness;
+    } else if (filterName === 'contrast') {
+      this._els.contrastRange.value = options.contrast;
+    } else if (filterName === 'saturation') {
+      this._els.saturationRange.value = options.saturation;
+    } else if (filterName === 'gamma') {
+      this._els.gammaRRange.value = options.gammaR;
+      this._els.gammaGRange.value = options.gammaG;
+      this._els.gammaBRange.value = options.gammaB;
     } else if (filterName === 'noise') {
       this._els.noiseRange.value = options.noise;
     } else if (filterName === 'tint') {
@@ -308,6 +329,17 @@ class Filter extends Submenu {
       case 'brightness':
         option.brightness = parseFloat(this._els.brightnessRange.value);
         break;
+      case 'contrast':
+        option.contrast = parseFloat(this._els.contrastRange.value);
+        break;
+      case 'saturation':
+        option.saturation = parseFloat(this._els.saturationRange.value);
+        break;
+      case 'gamma':
+        option.gammaR = parseFloat(this._els.gammaRRange.value);
+        option.gammaG = parseFloat(this._els.gammaGRange.value);
+        option.gammaB = parseFloat(this._els.gammaBRange.value);
+        break;
       case 'blend':
         option.mode = 'add';
         option.color = this._els.filterBlendColor.color;
@@ -345,6 +377,26 @@ class Filter extends Submenu {
       brightnessRange: new Range(
         { slider: this.selector('.tie-brightness-range') },
         FILTER_RANGE.brightnessRange
+      ),
+      contrastRange: new Range(
+        { slider: this.selector('.tie-contrast-range') },
+        FILTER_RANGE.contrastRange
+      ),
+      saturationRange: new Range(
+        { slider: this.selector('.tie-saturation-range') },
+        FILTER_RANGE.saturationRange
+      ),
+      gammaRRange: new Range(
+        { slider: this.selector('.tie-gamma-r-range') },
+        FILTER_RANGE.gammaRRange
+      ),
+      gammaGRange: new Range(
+        { slider: this.selector('.tie-gamma-g-range') },
+        FILTER_RANGE.gammaGRange
+      ),
+      gammaBRange: new Range(
+        { slider: this.selector('.tie-gamma-b-range') },
+        FILTER_RANGE.gammaBRange
       ),
       noiseRange: new Range({ slider: this.selector('.tie-noise-range') }, FILTER_RANGE.noiseRange),
       pixelateRange: new Range(

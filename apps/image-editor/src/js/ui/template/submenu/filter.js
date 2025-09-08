@@ -82,6 +82,28 @@ export default ({ locale }) => `
             <div class="tui-image-editor-checkbox-group tui-image-editor-disabled">
                 <div class="tui-image-editor-checkbox">
                     <label>
+                        <input type="checkbox" class="tie-contrast">
+                        <span>${locale.localize('Contrast')}</span>
+                    </label>
+                </div>
+                <div class="tui-image-editor-range-wrap short">
+                    <div class="tie-contrast-range"></div>
+                </div>
+            </div>
+            <div class="tui-image-editor-checkbox-group tui-image-editor-disabled">
+                <div class="tui-image-editor-checkbox">
+                    <label>
+                        <input type="checkbox" class="tie-saturation">
+                        <span>${locale.localize('Saturation')}</span>
+                    </label>
+                </div>
+                <div class="tui-image-editor-range-wrap short">
+                    <div class="tie-saturation-range"></div>
+                </div>
+            </div>
+            <div class="tui-image-editor-checkbox-group tui-image-editor-disabled">
+                <div class="tui-image-editor-checkbox">
+                    <label>
                         <input type="checkbox" class="tie-noise">
                         <span>${locale.localize('Noise')}</span>
                     </label>
@@ -118,6 +140,26 @@ export default ({ locale }) => `
                 <div class="tui-image-editor-newline tui-image-editor-range-wrap short">
                     <label>${locale.localize('Threshold')}</label>
                     <div class="tie-colorfilter-threshold-range"></div>
+                </div>
+            </div>
+            <div class="tui-image-editor-checkbox-group tui-image-editor-disabled">
+                <div class="tui-image-editor-checkbox">
+                    <label>
+                        <input type="checkbox" class="tie-gamma">
+                        <span>${locale.localize('Gamma')}</span>
+                    </label>
+                </div>
+                <div class="tui-image-editor-newline tui-image-editor-range-wrap">
+                    <label>${locale.localize('Red')}</label>
+                    <div class="tie-gamma-r-range vertical-range"></div>
+                </div>
+                <div class="tui-image-editor-newline tui-image-editor-range-wrap">
+                    <label>${locale.localize('Green')}</label>
+                    <div class="tie-gamma-g-range vertical-range"></div>
+                </div>
+                <div class="tui-image-editor-newline tui-image-editor-range-wrap">
+                    <label>${locale.localize('Blue')}</label>
+                    <div class="tie-gamma-b-range vertical-range"></div>
                 </div>
             </div>
         </li>

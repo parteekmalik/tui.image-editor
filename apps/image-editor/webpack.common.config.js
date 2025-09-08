@@ -23,22 +23,7 @@ module.exports = ({ minify, WEBPACK_BUILD }) => ({
       '@svg': path.resolve('src/svg'),
     },
   },
-  externals: [
-    {
-      'tui-code-snippet': {
-        commonjs: 'tui-code-snippet',
-        commonjs2: 'tui-code-snippet',
-        amd: 'tui-code-snippet',
-        root: ['tui', 'util'],
-      },
-      'tui-color-picker': {
-        commonjs: 'tui-color-picker',
-        commonjs2: 'tui-color-picker',
-        amd: 'tui-color-picker',
-        root: ['tui', 'colorPicker'],
-      },
-    },
-  ],
+  externals: [{}],
   module: {
     rules: [
       {

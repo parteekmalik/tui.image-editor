@@ -8,6 +8,9 @@ import Mask from '@/extension/mask';
 import Sharpen from '@/extension/sharpen';
 import Emboss from '@/extension/emboss';
 import ColorFilter from '@/extension/colorFilter';
+import Gamma from '@/extension/gamma';
+import Saturation from '@/extension/saturation';
+import Contrast from '@/extension/contrast';
 
 const { filters } = fabric.Image;
 
@@ -15,6 +18,9 @@ filters.Mask = Mask;
 filters.Sharpen = Sharpen;
 filters.Emboss = Emboss;
 filters.ColorFilter = ColorFilter;
+filters.Gamma = Gamma;
+filters.Saturation = Saturation;
+filters.Contrast = Contrast;
 
 /**
  * Filter
@@ -109,6 +115,14 @@ class Filter extends Component {
       return null;
     }
 
+    if (imgFilter.type === 'Gamma') {
+      return {
+        gammaR: imgFilter.gammaR,
+        gammaG: imgFilter.gammaG,
+        gammaB: imgFilter.gammaB,
+      };
+    }
+
     return extend({}, imgFilter.options);
   }
 
@@ -119,16 +133,23 @@ class Filter extends Component {
    * @private
    */
   _changeFilterValues(imgFilter, options) {
-    forEach(options, (value, key) => {
-      if (!isUndefined(imgFilter[key])) {
-        imgFilter[key] = value;
-      }
-    });
-    forEach(imgFilter.options, (value, key) => {
-      if (!isUndefined(options[key])) {
-        imgFilter.options[key] = options[key];
-      }
-    });
+    switch (imgFilter.type) {
+      case 'Gamma':
+        imgFilter.setOptions(options);
+        break;
+      default:
+        forEach(options, (value, key) => {
+          if (!isUndefined(imgFilter[key])) {
+            imgFilter[key] = value;
+          }
+        });
+        forEach(imgFilter.options, (value, key) => {
+          if (!isUndefined(options[key])) {
+            imgFilter.options[key] = options[key];
+          }
+        });
+        break;
+    }
   }
 
   /**
