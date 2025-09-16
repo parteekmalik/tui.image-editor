@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TUI Image Editor - New Filters Test</title>
-    <link rel="stylesheet" href="./dist/tui-image-editor.css">
+    <link rel="stylesheet" href="../dist/tui-image-editor.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -34,8 +34,8 @@
         <div class="editor-container" id="tui-image-editor"></div>
     </div>
 
-    <script src="./dist/tui-image-editor.js"></script>
-    <script src="./examples/js/theme/black-theme.js"></script>
+    <script src="../dist/tui-image-editor.js"></script>
+    <script src="./js/theme/black-theme.js"></script>
     <script>
         // Initialize TUI Image Editor with new filters
         const imageEditor = new tui.ImageEditor(document.querySelector('#tui-image-editor'), {
@@ -45,11 +45,10 @@
                     name: 'RandomImage'
                 },
                 theme: blackTheme,
-                menu: ['crop', 'flip', 'rotate', 'draw', 'shape', 'icon', 'text', 'mask', 'filter'],
-                initMenu: 'filter',
+                menu: ['crop', 'flip', 'rotate', 'draw', 'shape', 'icon', 'text', 'mask', 'filter', 'copyStamp'],
                 uiSize: {
                     width: '100%',
-                    height: '600px'
+                    height: '900px'
                 },
                 menuBarPosition: 'bottom'
             },

@@ -16,6 +16,7 @@ import Icon from '@/component/icon';
 import Filter from '@/component/filter';
 import Shape from '@/component/shape';
 import Zoom from '@/component/zoom';
+import CopyStamp from '@/component/copyStamp';
 import CropperDrawingMode from '@/drawingMode/cropper';
 import FreeDrawingMode from '@/drawingMode/freeDrawing';
 import LineDrawingMode from '@/drawingMode/lineDrawing';
@@ -23,6 +24,7 @@ import ShapeDrawingMode from '@/drawingMode/shape';
 import TextDrawingMode from '@/drawingMode/text';
 import IconDrawingMode from '@/drawingMode/icon';
 import ZoomDrawingMode from '@/drawingMode/zoom';
+import CopyStampMode from '@/drawingMode/copyStamp';
 import {
   makeSelectionUndoData,
   makeSelectionUndoDatum,
@@ -741,6 +743,8 @@ class Graphics {
 
     if (drawingMode === drawingModes.LINE_DRAWING) {
       compName = components.LINE;
+    } else if (drawingMode === drawingModes.COPY_STAMP) {
+      compName = components.COPY_STAMP;
     }
 
     this.getComponent(compName).setBrush(option);
@@ -994,6 +998,7 @@ class Graphics {
     this._register(this._drawingModeMap, new IconDrawingMode());
     this._register(this._drawingModeMap, new ZoomDrawingMode());
     this._register(this._drawingModeMap, new ResizeDrawingMode());
+    this._register(this._drawingModeMap, new CopyStampMode());
   }
 
   /**
@@ -1013,6 +1018,7 @@ class Graphics {
     this._register(this._componentMap, new Shape(this));
     this._register(this._componentMap, new Zoom(this));
     this._register(this._componentMap, new Resize(this));
+    this._register(this._componentMap, new CopyStamp(this));
   }
 
   /**
@@ -1253,6 +1259,10 @@ class Graphics {
         fObjectOptions.SELECTION_STYLE
       )
     );
+
+    if (this._drawingMode === drawingModes.COPY_STAMP) {
+      return;
+    }
 
     const params = this.createObjectProperties(obj.path);
 

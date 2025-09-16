@@ -20,6 +20,7 @@ export default {
       text: this._textAction(),
       mask: this._maskAction(),
       draw: this._drawAction(),
+      copyStamp: this._copyStampAction(),
       icon: this._iconAction(),
       filter: this._filterAction(),
       history: this._historyAction(),
@@ -255,6 +256,26 @@ export default {
           this.setBrush({
             color,
           });
+        },
+      },
+      this._commonAction()
+    );
+  },
+
+  /**
+   * CopyStamp Action
+   * @returns {Object} actions for ui copy stamp
+   * @private
+   */
+  _copyStampAction() {
+    return extend(
+      {
+        setDrawMode: (type, settings) => {
+          this.stopDrawingMode();
+          this.startDrawingMode('COPY_STAMP', settings);
+        },
+        setBrush: (settings) => {
+          this.setBrush(settings);
         },
       },
       this._commonAction()

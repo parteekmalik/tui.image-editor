@@ -25,6 +25,7 @@ import Draw from '@/ui/draw';
 import Filter from '@/ui/filter';
 import History from '@/ui/history';
 import Locale from '@/ui/locale/locale';
+import CopyStamp from '@/ui/copyStamp';
 
 const SUB_UI_COMPONENT = {
   Shape,
@@ -37,6 +38,7 @@ const SUB_UI_COMPONENT = {
   Icon,
   Draw,
   Filter,
+  CopyStamp,
 };
 
 const BI_EXPRESSION_MINSIZE_WHEN_TOP_POSITION = '1300';

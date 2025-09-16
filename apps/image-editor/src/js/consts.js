@@ -77,7 +77,8 @@ export const componentNames = keyMirror(
   'FILTER',
   'SHAPE',
   'ZOOM',
-  'RESIZE'
+  'RESIZE',
+  'COPY_STAMP'
 );
 
 /**
@@ -216,7 +217,8 @@ export const drawingModes = keyMirror(
   'SHAPE',
   'ICON',
   'ZOOM',
-  'RESIZE'
+  'RESIZE',
+  'COPY_STAMP'
 );
 
 /**
@@ -327,7 +329,7 @@ export const defaultRotateRangeValues = {
 
 export const defaultDrawRangeValues = {
   min: 5,
-  max: 30,
+  max: 300,
   value: 12,
 };
 
@@ -337,6 +339,12 @@ export const defaultDrawOpacityValues = {
   max: 1,
   value: 0.9,
   useDecimal: true,
+};
+
+export const defaultCopyStampRangeValues = {
+  min: 1,
+  max: 350,
+  value: 50,
 };
 
 export const defaultShapeStrokeValues = {
