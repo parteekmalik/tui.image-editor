@@ -262,6 +262,7 @@ class Ui {
           'text',
           'mask',
           'filter',
+          'copyStamp',
         ],
         initMenu: '',
         uiSize: {

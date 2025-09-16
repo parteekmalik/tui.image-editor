@@ -115,7 +115,7 @@ const {
  *      @param {string} options.includeUI.loadImage.path - image path
  *      @param {string} options.includeUI.loadImage.name - image name
  *    @param {Object} [options.includeUI.theme] - Theme object
- *    @param {Array} [options.includeUI.menu] - It can be selected when only specific menu is used, Default values are \['crop', 'flip', 'rotate', 'draw', 'shape', 'icon', 'text', 'mask', 'filter'\].
+ *    @param {Array} [options.includeUI.menu] - It can be selected when only specific menu is used, Default values are \['crop', 'flip', 'rotate', 'draw', 'shape', 'icon', 'text', 'mask', 'filter','copyStamp'\].
  *    @param {string} [options.includeUI.initMenu] - The first menu to be selected and started.
  *    @param {Object} [options.includeUI.uiSize] - ui size of editor
  *      @param {string} options.includeUI.uiSize.width - width of ui
