@@ -50,3 +50,10 @@ For each Fabric major:
 4. Keep the core production bundle green with `npm run build:prod --workspace @parteekmalik/tui-image-editor`.
 5. Test the editor UI manually in Brezel before publishing.
 6. Publish and integrate the new editor version before proceeding to the next Fabric major.
+
+## Fabric 5 status
+
+The core image editor is upgraded to Fabric 5.5.2. The migration replaces the removed
+`target` property on selection events with `selected[0]` and accepts Fabric 5's updated
+serialized text defaults. Jest, browser, type, lint, format, and production build checks
+pass. Manual Brezel validation and publishing remain before starting Fabric 6.
