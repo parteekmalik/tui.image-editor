@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Image editor browser tests</title>
+    <link rel="stylesheet" href="/dist/tui-image-editor.css" />
+    <style>
+      html,
+      body,
+      #editor {
+        width: 640px;
+        height: 480px;
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="editor"></div>
+    <script src="/dist/tui-image-editor.js"></script>
+    <script>
+      const source = document.createElement('canvas');
+      source.width = 80;
+      source.height = 60;
+
+      const context = source.getContext('2d');
+      context.fillStyle = '#ff0000';
+      context.fillRect(0, 0, 40, 30);
+      context.fillStyle = '#00ff00';
+      context.fillRect(40, 0, 40, 30);
+      context.fillStyle = '#0000ff';
+      context.fillRect(0, 30, 40, 30);
+      context.fillStyle = '#ffff00';
+      context.fillRect(40, 30, 40, 30);
+
+      window.editor = new tui.ImageEditor('#editor', {
+        cssMaxWidth: 640,
+        cssMaxHeight: 480,
+        usageStatistics: false,
+      });
+      window.ready = window.editor.loadImageFromURL(source.toDataURL('image/png'), 'quadrants');
+    </script>
+  </body>
+</html>

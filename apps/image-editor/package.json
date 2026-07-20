@@ -20,6 +20,8 @@
   ],
   "scripts": {
     "test": "jest --forceExit --detectOpenHandles",
+    "test:browser": "playwright test --config=playwright.config.js",
+    "test:browser:serve": "NODE_OPTIONS=--openssl-legacy-provider webpack serve --config webpack.browser.config.js",
     "test:types": "tsc --project tests/types",
     "build": "NODE_OPTIONS=\"--openssl-legacy-provider\" npm run build:clean && npm run build:svg && npm run build:prod && npm run build:minify && node tsBannerGenerator.js",
     "build:clean": "rm -rf ./dist",

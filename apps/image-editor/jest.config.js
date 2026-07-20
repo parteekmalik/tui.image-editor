@@ -10,6 +10,7 @@ module.exports = {
   },
   transformIgnorePatterns: ['<rootDir>/node_modules/'],
   testMatch: ['<rootDir>/**/*.spec.js'],
+  testPathIgnorePatterns: ['<rootDir>/tests/browser/'],
   clearMocks: true,
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/js/$1',
