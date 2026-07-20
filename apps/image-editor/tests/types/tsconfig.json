@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
     "noEmit": true,
-    "noImplicitAny": false
+    "noImplicitAny": false,
+    "types": []
   },
   "include": [
     "../../index.d.ts", "./type-tests.ts"]

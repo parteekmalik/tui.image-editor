@@ -18,4 +18,5 @@ jobs:
       - run: npm ci --omit=optional
       - run: npx playwright install --with-deps chromium
       - run: npm test --workspace @parteekmalik/tui-image-editor -- --runInBand
+      - run: npm run test:types --workspace @parteekmalik/tui-image-editor
       - run: npm run test:browser

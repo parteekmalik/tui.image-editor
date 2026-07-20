@@ -41,8 +41,7 @@ For each Fabric major:
 
 1. Follow only that major's upgrade guide.
 2. Keep `npm run test:browser` green.
-3. Keep the core production bundle green with `npm run build:prod --workspace @parteekmalik/tui-image-editor`.
-4. Test the editor UI manually in Brezel before publishing.
-5. Publish and integrate the new editor version before proceeding to the next Fabric major.
-
-The type test currently uses TypeScript 3.9 and cannot parse current transitive type declarations. This baseline issue predates the browser suite and should be fixed separately rather than bypassed during a Fabric upgrade.
+3. Keep `npm run test:types --workspace @parteekmalik/tui-image-editor` green.
+4. Keep the core production bundle green with `npm run build:prod --workspace @parteekmalik/tui-image-editor`.
+5. Test the editor UI manually in Brezel before publishing.
+6. Publish and integrate the new editor version before proceeding to the next Fabric major.
