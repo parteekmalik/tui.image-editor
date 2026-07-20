@@ -21,10 +21,15 @@ The suite exercises the installed Fabric version in a real browser and verifies:
 
 - Image loading, canvas creation, PNG export, dimensions, and pixel colors
 - Shape and text creation and mutation
+- Pointer-driven selection, movement, resizing, and rotation
+- Inline text editing through browser keyboard input
+- Free drawing through browser pointer input
 - Undo and redo state restoration
 - Registered SVG path rendering
 - Flip, rotation, and crop geometry
 - Filter application, rendered pixels, and filter removal
+- Full-UI menu switching, local file loading, and rendered image output
+- Menu and object selection in a mobile touch viewport
 
 The fixture is local and deterministic. It does not use remote images, CDN scripts, or mocked canvas rendering.
 

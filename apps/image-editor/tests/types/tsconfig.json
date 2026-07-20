@@ -4,6 +4,5 @@
     "noImplicitAny": false,
     "types": []
   },
-  "include": [
-    "../../index.d.ts", "./type-tests.ts"]
+  "include": ["../../index.d.ts", "./type-tests.ts"]
 }

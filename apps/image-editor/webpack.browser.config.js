@@ -7,6 +7,9 @@ module.exports = (env = {}) =>
   merge(commonWebpackConfig(env), {
     mode: 'development',
     devServer: {
+      client: {
+        overlay: false,
+      },
       compress: true,
       host: '127.0.0.1',
       port: 4173,

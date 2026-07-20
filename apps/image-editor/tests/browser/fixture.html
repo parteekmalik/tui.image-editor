@@ -9,8 +9,8 @@
       html,
       body,
       #editor {
-        width: 640px;
-        height: 480px;
+        width: 100vw;
+        height: 100vh;
         margin: 0;
       }
     </style>
@@ -33,12 +33,57 @@
       context.fillStyle = '#ffff00';
       context.fillRect(40, 30, 40, 30);
 
-      window.editor = new tui.ImageEditor('#editor', {
+      const sourceUrl = source.toDataURL('image/png');
+      const useUI = new URLSearchParams(window.location.search).has('ui');
+      const options = {
         cssMaxWidth: 640,
         cssMaxHeight: 480,
         usageStatistics: false,
-      });
-      window.ready = window.editor.loadImageFromURL(source.toDataURL('image/png'), 'quadrants');
+      };
+
+      if (useUI) {
+        options.includeUI = {
+          loadImage: { path: sourceUrl, name: 'quadrants' },
+          menu: ['crop', 'flip', 'rotate', 'draw', 'shape', 'icon', 'text', 'filter'],
+          uiSize: { width: '100%', height: '100%' },
+          menuBarPosition: 'bottom',
+        };
+      }
+
+      window.editor = new tui.ImageEditor('#editor', options);
+      window.ready = useUI
+        ? new Promise((resolve) => {
+            const waitForImage = () => {
+              if (window.editor.getImageName() === 'quadrants') {
+                resolve();
+              } else {
+                requestAnimationFrame(waitForImage);
+              }
+            };
+            waitForImage();
+          })
+        : window.editor.loadImageFromURL(sourceUrl, 'quadrants');
+
+      window.getObjectControls = (id) => {
+        const canvas = window.editor._graphics.getCanvas();
+        const object = window.editor._graphics.getObject(id);
+        const bounds = canvas.upperCanvasEl.getBoundingClientRect();
+        const scaleX = bounds.width / canvas.getWidth();
+        const scaleY = bounds.height / canvas.getHeight();
+        object.setCoords();
+
+        const point = ({ x, y }) => ({
+          x: bounds.left + x * scaleX,
+          y: bounds.top + y * scaleY,
+        });
+
+        return {
+          center: point(object.getCenterPoint()),
+          bottomRight: point(object.oCoords.br),
+          middleRight: point(object.oCoords.mr),
+          rotation: point(object.oCoords.mtr),
+        };
+      };
     </script>
   </body>
 </html>
