@@ -1,4 +1,4 @@
-import { fabric } from 'fabric';
+import * as fabric from 'fabric';
 import extend from 'tui-code-snippet/object/extend';
 import { clamp } from '@/util';
 import { eventNames as events, keyCodes } from '@/consts';
@@ -52,354 +52,336 @@ function getScaleBasis(diffX, diffY) {
  * @extends {fabric.Rect}
  * @ignore
  */
-const Cropzone = fabric.util.createClass(
-  fabric.Rect,
-  /** @lends Cropzone.prototype */ {
-    /**
-     * Constructor
-     * @param {Object} canvas canvas
-     * @param {Object} options Options object
-     * @param {Object} extendsOptions object for extends "options"
-     * @override
-     */
-    initialize(canvas, options, extendsOptions) {
-      options = extend(options, extendsOptions);
-      options.type = 'cropzone';
+class Cropzone extends fabric.Rect {
+  /**
+   * Constructor
+   * @param {Object} canvas canvas
+   * @param {Object} options Options object
+   * @param {Object} extendsOptions object for extends "options"
+   * @override
+   */
+  constructor(canvas, options, extendsOptions) {
+    options = extend(options, extendsOptions);
+    super(options);
 
-      this.callSuper('initialize', options);
-      this._addEventHandler();
+    this.canvas = canvas;
+    this.options = options;
+    this._addEventHandler();
+  }
+}
 
-      this.canvas = canvas;
-      this.options = options;
-    },
-    canvasEventDelegation(eventName) {
-      let delegationState = 'unregistered';
-      const isRegistered = this.canvasEventTrigger[eventName] !== NOOP_FUNCTION;
-      if (isRegistered) {
-        delegationState = 'registered';
-      } else if ([events.OBJECT_MOVED, events.OBJECT_SCALED].indexOf(eventName) < 0) {
-        delegationState = 'none';
-      }
+Cropzone.type = 'cropzone';
 
-      return delegationState;
-    },
-    canvasEventRegister(eventName, eventTrigger) {
-      this.canvasEventTrigger[eventName] = eventTrigger;
-    },
-    _addEventHandler() {
-      this.canvasEventTrigger = {
-        [events.OBJECT_MOVED]: NOOP_FUNCTION,
-        [events.OBJECT_SCALED]: NOOP_FUNCTION,
-      };
-      this.on({
-        moving: this._onMoving.bind(this),
-        scaling: this._onScaling.bind(this),
+Object.assign(Cropzone.prototype, {
+  canvasEventDelegation(eventName) {
+    let delegationState = 'unregistered';
+    const isRegistered = this.canvasEventTrigger[eventName] !== NOOP_FUNCTION;
+    if (isRegistered) {
+      delegationState = 'registered';
+    } else if ([events.OBJECT_MOVED, events.OBJECT_SCALED].indexOf(eventName) < 0) {
+      delegationState = 'none';
+    }
+
+    return delegationState;
+  },
+  canvasEventRegister(eventName, eventTrigger) {
+    this.canvasEventTrigger[eventName] = eventTrigger;
+  },
+  _addEventHandler() {
+    this.canvasEventTrigger = {
+      [events.OBJECT_MOVED]: NOOP_FUNCTION,
+      [events.OBJECT_SCALED]: NOOP_FUNCTION,
+    };
+    this.on({
+      moving: this._onMoving.bind(this),
+      scaling: this._onScaling.bind(this),
+    });
+    document.addEventListener('keydown', this._onKeyDown.bind(this));
+    document.addEventListener('keyup', this._onKeyUp.bind(this));
+  },
+  _renderCropzone(ctx) {
+    const cropzoneDashLineWidth = 7;
+    const cropzoneDashLineOffset = 7;
+
+    // Calc original scale
+    const originalFlipX = this.flipX ? -1 : 1;
+    const originalFlipY = this.flipY ? -1 : 1;
+    const originalScaleX = originalFlipX / this.scaleX;
+    const originalScaleY = originalFlipY / this.scaleY;
+
+    // Set original scale
+    ctx.scale(originalScaleX, originalScaleY);
+
+    // Render outer rect
+    this._fillOuterRect(ctx, 'rgba(0, 0, 0, 0.5)');
+
+    if (this.options.lineWidth) {
+      this._fillInnerRect(ctx);
+      this._strokeBorder(ctx, 'rgb(255, 255, 255)', {
+        lineWidth: this.options.lineWidth,
       });
-      fabric.util.addListener(document, 'keydown', this._onKeyDown.bind(this));
-      fabric.util.addListener(document, 'keyup', this._onKeyUp.bind(this));
-    },
-    _renderCropzone(ctx) {
-      const cropzoneDashLineWidth = 7;
-      const cropzoneDashLineOffset = 7;
+    } else {
+      // Black dash line
+      this._strokeBorder(ctx, 'rgb(0, 0, 0)', {
+        lineDashWidth: cropzoneDashLineWidth,
+      });
 
-      // Calc original scale
-      const originalFlipX = this.flipX ? -1 : 1;
-      const originalFlipY = this.flipY ? -1 : 1;
-      const originalScaleX = originalFlipX / this.scaleX;
-      const originalScaleY = originalFlipY / this.scaleY;
+      // White dash line
+      this._strokeBorder(ctx, 'rgb(255, 255, 255)', {
+        lineDashWidth: cropzoneDashLineWidth,
+        lineDashOffset: cropzoneDashLineOffset,
+      });
+    }
 
-      // Set original scale
-      ctx.scale(originalScaleX, originalScaleY);
+    // Reset scale
+    ctx.scale(1 / originalScaleX, 1 / originalScaleY);
+  },
 
-      // Render outer rect
-      this._fillOuterRect(ctx, 'rgba(0, 0, 0, 0.5)');
+  /**
+   * Render Crop-zone
+   * @private
+   * @override
+   */
+  _render(ctx) {
+    fabric.Rect.prototype._render.call(this, ctx);
 
-      if (this.options.lineWidth) {
-        this._fillInnerRect(ctx);
-        this._strokeBorder(ctx, 'rgb(255, 255, 255)', {
-          lineWidth: this.options.lineWidth,
-        });
-      } else {
-        // Black dash line
-        this._strokeBorder(ctx, 'rgb(0, 0, 0)', {
-          lineDashWidth: cropzoneDashLineWidth,
-        });
+    this._renderCropzone(ctx);
+  },
 
-        // White dash line
-        this._strokeBorder(ctx, 'rgb(255, 255, 255)', {
-          lineDashWidth: cropzoneDashLineWidth,
-          lineDashOffset: cropzoneDashLineOffset,
-        });
-      }
+  /**
+   * Cropzone-coordinates with outer rectangle
+   *
+   *     x0     x1         x2      x3
+   *  y0 +--------------------------+
+   *     |///////|//////////|///////|    // <--- "Outer-rectangle"
+   *     |///////|//////////|///////|
+   *  y1 +-------+----------+-------+
+   *     |///////| Cropzone |///////|    Cropzone is the "Inner-rectangle"
+   *     |///////|  (0, 0)  |///////|    Center point (0, 0)
+   *  y2 +-------+----------+-------+
+   *     |///////|//////////|///////|
+   *     |///////|//////////|///////|
+   *  y3 +--------------------------+
+   *
+   * @typedef {{x: Array<number>, y: Array<number>}} cropzoneCoordinates
+   * @ignore
+   */
 
-      // Reset scale
-      ctx.scale(1 / originalScaleX, 1 / originalScaleY);
-    },
+  /**
+   * Fill outer rectangle
+   * @param {CanvasRenderingContext2D} ctx - Context
+   * @param {string|CanvasGradient|CanvasPattern} fillStyle - Fill-style
+   * @private
+   */
+  _fillOuterRect(ctx, fillStyle) {
+    const { x, y } = this._getCoordinates();
 
-    /**
-     * Render Crop-zone
-     * @private
-     * @override
-     */
-    _render(ctx) {
-      this.callSuper('_render', ctx);
+    ctx.save();
+    ctx.fillStyle = fillStyle;
+    ctx.beginPath();
 
-      this._renderCropzone(ctx);
-    },
+    // Outer rectangle
+    // Numbers are +/-1 so that overlay edges don't get blurry.
+    ctx.moveTo(x[0] - 1, y[0] - 1);
+    ctx.lineTo(x[3] + 1, y[0] - 1);
+    ctx.lineTo(x[3] + 1, y[3] + 1);
+    ctx.lineTo(x[0] - 1, y[3] + 1);
+    ctx.lineTo(x[0] - 1, y[0] - 1);
+    ctx.closePath();
 
-    /**
-     * Cropzone-coordinates with outer rectangle
-     *
-     *     x0     x1         x2      x3
-     *  y0 +--------------------------+
-     *     |///////|//////////|///////|    // <--- "Outer-rectangle"
-     *     |///////|//////////|///////|
-     *  y1 +-------+----------+-------+
-     *     |///////| Cropzone |///////|    Cropzone is the "Inner-rectangle"
-     *     |///////|  (0, 0)  |///////|    Center point (0, 0)
-     *  y2 +-------+----------+-------+
-     *     |///////|//////////|///////|
-     *     |///////|//////////|///////|
-     *  y3 +--------------------------+
-     *
-     * @typedef {{x: Array<number>, y: Array<number>}} cropzoneCoordinates
-     * @ignore
-     */
+    // Inner rectangle
+    ctx.moveTo(x[1], y[1]);
+    ctx.lineTo(x[1], y[2]);
+    ctx.lineTo(x[2], y[2]);
+    ctx.lineTo(x[2], y[1]);
+    ctx.lineTo(x[1], y[1]);
+    ctx.closePath();
 
-    /**
-     * Fill outer rectangle
-     * @param {CanvasRenderingContext2D} ctx - Context
-     * @param {string|CanvasGradient|CanvasPattern} fillStyle - Fill-style
-     * @private
-     */
-    _fillOuterRect(ctx, fillStyle) {
-      const { x, y } = this._getCoordinates();
+    ctx.fill();
+    ctx.restore();
+  },
 
-      ctx.save();
-      ctx.fillStyle = fillStyle;
-      ctx.beginPath();
+  /**
+   * Draw Inner grid line
+   * @param {CanvasRenderingContext2D} ctx - Context
+   * @private
+   */
+  _fillInnerRect(ctx) {
+    const { x: outerX, y: outerY } = this._getCoordinates();
+    const x = this._caculateInnerPosition(outerX, (outerX[2] - outerX[1]) / 3);
+    const y = this._caculateInnerPosition(outerY, (outerY[2] - outerY[1]) / 3);
 
-      // Outer rectangle
-      // Numbers are +/-1 so that overlay edges don't get blurry.
-      ctx.moveTo(x[0] - 1, y[0] - 1);
-      ctx.lineTo(x[3] + 1, y[0] - 1);
-      ctx.lineTo(x[3] + 1, y[3] + 1);
-      ctx.lineTo(x[0] - 1, y[3] + 1);
-      ctx.lineTo(x[0] - 1, y[0] - 1);
-      ctx.closePath();
+    ctx.save();
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
+    ctx.lineWidth = this.options.lineWidth;
+    ctx.beginPath();
 
-      // Inner rectangle
-      ctx.moveTo(x[1], y[1]);
-      ctx.lineTo(x[1], y[2]);
-      ctx.lineTo(x[2], y[2]);
-      ctx.lineTo(x[2], y[1]);
-      ctx.lineTo(x[1], y[1]);
-      ctx.closePath();
+    ctx.moveTo(x[0], y[1]);
+    ctx.lineTo(x[3], y[1]);
 
-      ctx.fill();
-      ctx.restore();
-    },
+    ctx.moveTo(x[0], y[2]);
+    ctx.lineTo(x[3], y[2]);
 
-    /**
-     * Draw Inner grid line
-     * @param {CanvasRenderingContext2D} ctx - Context
-     * @private
-     */
-    _fillInnerRect(ctx) {
-      const { x: outerX, y: outerY } = this._getCoordinates();
-      const x = this._caculateInnerPosition(outerX, (outerX[2] - outerX[1]) / 3);
-      const y = this._caculateInnerPosition(outerY, (outerY[2] - outerY[1]) / 3);
+    ctx.moveTo(x[1], y[0]);
+    ctx.lineTo(x[1], y[3]);
 
-      ctx.save();
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
-      ctx.lineWidth = this.options.lineWidth;
-      ctx.beginPath();
+    ctx.moveTo(x[2], y[0]);
+    ctx.lineTo(x[2], y[3]);
+    ctx.stroke();
+    ctx.closePath();
 
-      ctx.moveTo(x[0], y[1]);
-      ctx.lineTo(x[3], y[1]);
+    ctx.restore();
+  },
 
-      ctx.moveTo(x[0], y[2]);
-      ctx.lineTo(x[3], y[2]);
+  /**
+   * Calculate Inner Position
+   * @param {Array} outer - outer position
+   * @param {number} size - interval for calculate
+   * @returns {Array} - inner position
+   * @private
+   */
+  _caculateInnerPosition(outer, size) {
+    const position = [];
+    position[0] = outer[1];
+    position[1] = outer[1] + size;
+    position[2] = outer[1] + size * 2;
+    position[3] = outer[2];
 
-      ctx.moveTo(x[1], y[0]);
-      ctx.lineTo(x[1], y[3]);
+    return position;
+  },
 
-      ctx.moveTo(x[2], y[0]);
-      ctx.lineTo(x[2], y[3]);
-      ctx.stroke();
-      ctx.closePath();
+  /**
+   * Get coordinates
+   * @returns {cropzoneCoordinates} - {@link cropzoneCoordinates}
+   * @private
+   */
+  _getCoordinates() {
+    const { canvas, width, height, left, top } = this;
+    const halfWidth = width / 2;
+    const halfHeight = height / 2;
+    const canvasHeight = canvas.getHeight(); // fabric object
+    const canvasWidth = canvas.getWidth(); // fabric object
 
-      ctx.restore();
-    },
+    return {
+      x: [
+        -(halfWidth + left), // x0
+        -halfWidth, // x1
+        halfWidth, // x2
+        halfWidth + (canvasWidth - left - width), // x3
+      ].map(Math.ceil),
+      y: [
+        -(halfHeight + top), // y0
+        -halfHeight, // y1
+        halfHeight, // y2
+        halfHeight + (canvasHeight - top - height), // y3
+      ].map(Math.ceil),
+    };
+  },
 
-    /**
-     * Calculate Inner Position
-     * @param {Array} outer - outer position
-     * @param {number} size - interval for calculate
-     * @returns {Array} - inner position
-     * @private
-     */
-    _caculateInnerPosition(outer, size) {
-      const position = [];
-      position[0] = outer[1];
-      position[1] = outer[1] + size;
-      position[2] = outer[1] + size * 2;
-      position[3] = outer[2];
+  /**
+   * Stroke border
+   * @param {CanvasRenderingContext2D} ctx - Context
+   * @param {string|CanvasGradient|CanvasPattern} strokeStyle - Stroke-style
+   * @param {number} lineDashWidth - Dash width
+   * @param {number} [lineDashOffset] - Dash offset
+   * @param {number} [lineWidth] - line width
+   * @private
+   */
+  _strokeBorder(ctx, strokeStyle, { lineDashWidth, lineDashOffset, lineWidth }) {
+    const halfWidth = this.width / 2;
+    const halfHeight = this.height / 2;
 
-      return position;
-    },
+    ctx.save();
+    ctx.strokeStyle = strokeStyle;
 
-    /**
-     * Get coordinates
-     * @returns {cropzoneCoordinates} - {@link cropzoneCoordinates}
-     * @private
-     */
-    _getCoordinates() {
-      const { canvas, width, height, left, top } = this;
-      const halfWidth = width / 2;
-      const halfHeight = height / 2;
-      const canvasHeight = canvas.getHeight(); // fabric object
-      const canvasWidth = canvas.getWidth(); // fabric object
+    if (ctx.setLineDash) {
+      ctx.setLineDash([lineDashWidth, lineDashWidth]);
+    }
+    if (lineDashOffset) {
+      ctx.lineDashOffset = lineDashOffset;
+    }
+    if (lineWidth) {
+      ctx.lineWidth = lineWidth;
+    }
 
-      return {
-        x: [
-          -(halfWidth + left), // x0
-          -halfWidth, // x1
-          halfWidth, // x2
-          halfWidth + (canvasWidth - left - width), // x3
-        ].map(Math.ceil),
-        y: [
-          -(halfHeight + top), // y0
-          -halfHeight, // y1
-          halfHeight, // y2
-          halfHeight + (canvasHeight - top - height), // y3
-        ].map(Math.ceil),
-      };
-    },
+    ctx.beginPath();
+    ctx.moveTo(-halfWidth, -halfHeight);
+    ctx.lineTo(halfWidth, -halfHeight);
+    ctx.lineTo(halfWidth, halfHeight);
+    ctx.lineTo(-halfWidth, halfHeight);
+    ctx.lineTo(-halfWidth, -halfHeight);
+    ctx.stroke();
 
-    /**
-     * Stroke border
-     * @param {CanvasRenderingContext2D} ctx - Context
-     * @param {string|CanvasGradient|CanvasPattern} strokeStyle - Stroke-style
-     * @param {number} lineDashWidth - Dash width
-     * @param {number} [lineDashOffset] - Dash offset
-     * @param {number} [lineWidth] - line width
-     * @private
-     */
-    _strokeBorder(ctx, strokeStyle, { lineDashWidth, lineDashOffset, lineWidth }) {
-      const halfWidth = this.width / 2;
-      const halfHeight = this.height / 2;
+    ctx.restore();
+  },
 
-      ctx.save();
-      ctx.strokeStyle = strokeStyle;
+  /**
+   * onMoving event listener
+   * @private
+   */
+  _onMoving() {
+    const { height, width, left, top } = this;
+    const maxLeft = this.canvas.getWidth() - width;
+    const maxTop = this.canvas.getHeight() - height;
 
-      if (ctx.setLineDash) {
-        ctx.setLineDash([lineDashWidth, lineDashWidth]);
-      }
-      if (lineDashOffset) {
-        ctx.lineDashOffset = lineDashOffset;
-      }
-      if (lineWidth) {
-        ctx.lineWidth = lineWidth;
-      }
+    this.left = clamp(left, 0, maxLeft);
+    this.top = clamp(top, 0, maxTop);
 
-      ctx.beginPath();
-      ctx.moveTo(-halfWidth, -halfHeight);
-      ctx.lineTo(halfWidth, -halfHeight);
-      ctx.lineTo(halfWidth, halfHeight);
-      ctx.lineTo(-halfWidth, halfHeight);
-      ctx.lineTo(-halfWidth, -halfHeight);
-      ctx.stroke();
+    this.canvasEventTrigger[events.OBJECT_MOVED](this);
+  },
 
-      ctx.restore();
-    },
+  /**
+   * onScaling event listener
+   * @param {{e: MouseEvent}} fEvent - Fabric event
+   * @private
+   */
+  _onScaling(fEvent) {
+    const selectedCorner = fEvent.transform.corner;
+    const pointer = this.canvas.getScenePoint(fEvent.e);
+    const settings = this._calcScalingSizeFromPointer(pointer, selectedCorner);
 
-    /**
-     * onMoving event listener
-     * @private
-     */
-    _onMoving() {
-      const { height, width, left, top } = this;
-      const maxLeft = this.canvas.getWidth() - width;
-      const maxTop = this.canvas.getHeight() - height;
+    // On scaling cropzone,
+    // change real width and height and fix scaleFactor to 1
+    this.scale(1).set(settings);
 
-      this.left = clamp(left, 0, maxLeft);
-      this.top = clamp(top, 0, maxTop);
+    this.canvasEventTrigger[events.OBJECT_SCALED](this);
+  },
 
-      this.canvasEventTrigger[events.OBJECT_MOVED](this);
-    },
+  /**
+   * Calc scaled size from mouse pointer with selected corner
+   * @param {{x: number, y: number}} pointer - Mouse position
+   * @param {string} selectedCorner - selected corner type
+   * @returns {Object} Having left or(and) top or(and) width or(and) height.
+   * @private
+   */
+  _calcScalingSizeFromPointer(pointer, selectedCorner) {
+    const isCornerTypeValid = cornerTypeValid(selectedCorner);
 
-    /**
-     * onScaling event listener
-     * @param {{e: MouseEvent}} fEvent - Fabric event
-     * @private
-     */
-    _onScaling(fEvent) {
-      const selectedCorner = fEvent.transform.corner;
-      const pointer = this.canvas.getPointer(fEvent.e);
-      const settings = this._calcScalingSizeFromPointer(pointer, selectedCorner);
+    return isCornerTypeValid && this._resizeCropZone(pointer, selectedCorner);
+  },
 
-      // On scaling cropzone,
-      // change real width and height and fix scaleFactor to 1
-      this.scale(1).set(settings);
+  /**
+   * Align with cropzone ratio
+   * @param {number} width - cropzone width
+   * @param {number} height - cropzone height
+   * @param {number} maxWidth - limit max width
+   * @param {number} maxHeight - limit max height
+   * @param {number} scaleTo - cropzone ratio
+   * @returns {{width: number, height: number}}
+   * @private
+   */
+  adjustRatioCropzoneSize({ width, height, leftMaker, topMaker, maxWidth, maxHeight, scaleTo }) {
+    width = maxWidth ? clamp(width, 1, maxWidth) : width;
+    height = maxHeight ? clamp(height, 1, maxHeight) : height;
 
-      this.canvasEventTrigger[events.OBJECT_SCALED](this);
-    },
-
-    /**
-     * Calc scaled size from mouse pointer with selected corner
-     * @param {{x: number, y: number}} pointer - Mouse position
-     * @param {string} selectedCorner - selected corner type
-     * @returns {Object} Having left or(and) top or(and) width or(and) height.
-     * @private
-     */
-    _calcScalingSizeFromPointer(pointer, selectedCorner) {
-      const isCornerTypeValid = cornerTypeValid(selectedCorner);
-
-      return isCornerTypeValid && this._resizeCropZone(pointer, selectedCorner);
-    },
-
-    /**
-     * Align with cropzone ratio
-     * @param {number} width - cropzone width
-     * @param {number} height - cropzone height
-     * @param {number} maxWidth - limit max width
-     * @param {number} maxHeight - limit max height
-     * @param {number} scaleTo - cropzone ratio
-     * @returns {{width: number, height: number}}
-     * @private
-     */
-    adjustRatioCropzoneSize({ width, height, leftMaker, topMaker, maxWidth, maxHeight, scaleTo }) {
-      width = maxWidth ? clamp(width, 1, maxWidth) : width;
-      height = maxHeight ? clamp(height, 1, maxHeight) : height;
-
-      if (!this.presetRatio) {
-        if (this._withShiftKey) {
-          // make fixed ratio cropzone
-          if (width > height) {
-            height = width;
-          } else if (height > width) {
-            width = height;
-          }
+    if (!this.presetRatio) {
+      if (this._withShiftKey) {
+        // make fixed ratio cropzone
+        if (width > height) {
+          height = width;
+        } else if (height > width) {
+          width = height;
         }
-
-        return {
-          width,
-          height,
-          left: leftMaker(width),
-          top: topMaker(height),
-        };
-      }
-
-      if (scaleTo === 'width') {
-        height = width / this.presetRatio;
-      } else {
-        width = height * this.presetRatio;
-      }
-
-      const maxScaleFactor = Math.min(maxWidth / width, maxHeight / height);
-      if (maxScaleFactor <= 1) {
-        [width, height] = [width, height].map((v) => v * maxScaleFactor);
       }
 
       return {
@@ -408,161 +390,179 @@ const Cropzone = fabric.util.createClass(
         left: leftMaker(width),
         top: topMaker(height),
       };
-    },
+    }
 
-    /**
-     * Get dimension last state cropzone
-     * @returns {{rectTop: number, rectLeft: number, rectWidth: number, rectHeight: number}}
-     * @private
-     */
-    _getCropzoneRectInfo() {
-      const { width: canvasWidth, height: canvasHeight } = this.canvas;
-      const {
-        top: rectTop,
-        left: rectLeft,
+    if (scaleTo === 'width') {
+      height = width / this.presetRatio;
+    } else {
+      width = height * this.presetRatio;
+    }
+
+    const maxScaleFactor = Math.min(maxWidth / width, maxHeight / height);
+    if (maxScaleFactor <= 1) {
+      [width, height] = [width, height].map((v) => v * maxScaleFactor);
+    }
+
+    return {
+      width,
+      height,
+      left: leftMaker(width),
+      top: topMaker(height),
+    };
+  },
+
+  /**
+   * Get dimension last state cropzone
+   * @returns {{rectTop: number, rectLeft: number, rectWidth: number, rectHeight: number}}
+   * @private
+   */
+  _getCropzoneRectInfo() {
+    const { width: canvasWidth, height: canvasHeight } = this.canvas;
+    const {
+      top: rectTop,
+      left: rectLeft,
+      width: rectWidth,
+      height: rectHeight,
+    } = this.getBoundingRect();
+
+    return {
+      rectTop,
+      rectLeft,
+      rectWidth,
+      rectHeight,
+      rectRight: rectLeft + rectWidth,
+      rectBottom: rectTop + rectHeight,
+      canvasWidth,
+      canvasHeight,
+    };
+  },
+
+  /**
+   * Calc scaling dimension
+   * @param {Object} position - Mouse position
+   * @param {string} corner - corner type
+   * @returns {{left: number, top: number, width: number, height: number}}
+   * @private
+   */
+  _resizeCropZone({ x, y }, corner) {
+    const {
+      rectWidth,
+      rectHeight,
+      rectTop,
+      rectLeft,
+      rectBottom,
+      rectRight,
+      canvasWidth,
+      canvasHeight,
+    } = this._getCropzoneRectInfo();
+
+    const resizeInfoMap = {
+      tl: {
+        width: rectRight - x,
+        height: rectBottom - y,
+        leftMaker: (newWidth) => rectRight - newWidth,
+        topMaker: (newHeight) => rectBottom - newHeight,
+        maxWidth: rectRight,
+        maxHeight: rectBottom,
+        scaleTo: getScaleBasis(rectLeft - x, rectTop - y),
+      },
+      tr: {
+        width: x - rectLeft,
+        height: rectBottom - y,
+        leftMaker: () => rectLeft,
+        topMaker: (newHeight) => rectBottom - newHeight,
+        maxWidth: canvasWidth - rectLeft,
+        maxHeight: rectBottom,
+        scaleTo: getScaleBasis(x - rectRight, rectTop - y),
+      },
+      mt: {
         width: rectWidth,
+        height: rectBottom - y,
+        leftMaker: () => rectLeft,
+        topMaker: (newHeight) => rectBottom - newHeight,
+        maxWidth: canvasWidth - rectLeft,
+        maxHeight: rectBottom,
+        scaleTo: 'height',
+      },
+      ml: {
+        width: rectRight - x,
         height: rectHeight,
-      } = this.getBoundingRect(false, true);
+        leftMaker: (newWidth) => rectRight - newWidth,
+        topMaker: () => rectTop,
+        maxWidth: rectRight,
+        maxHeight: canvasHeight - rectTop,
+        scaleTo: 'width',
+      },
+      mr: {
+        width: x - rectLeft,
+        height: rectHeight,
+        leftMaker: () => rectLeft,
+        topMaker: () => rectTop,
+        maxWidth: canvasWidth - rectLeft,
+        maxHeight: canvasHeight - rectTop,
+        scaleTo: 'width',
+      },
+      mb: {
+        width: rectWidth,
+        height: y - rectTop,
+        leftMaker: () => rectLeft,
+        topMaker: () => rectTop,
+        maxWidth: canvasWidth - rectLeft,
+        maxHeight: canvasHeight - rectTop,
+        scaleTo: 'height',
+      },
+      bl: {
+        width: rectRight - x,
+        height: y - rectTop,
+        leftMaker: (newWidth) => rectRight - newWidth,
+        topMaker: () => rectTop,
+        maxWidth: rectRight,
+        maxHeight: canvasHeight - rectTop,
+        scaleTo: getScaleBasis(rectLeft - x, y - rectBottom),
+      },
+      br: {
+        width: x - rectLeft,
+        height: y - rectTop,
+        leftMaker: () => rectLeft,
+        topMaker: () => rectTop,
+        maxWidth: canvasWidth - rectLeft,
+        maxHeight: canvasHeight - rectTop,
+        scaleTo: getScaleBasis(x - rectRight, y - rectBottom),
+      },
+    };
 
-      return {
-        rectTop,
-        rectLeft,
-        rectWidth,
-        rectHeight,
-        rectRight: rectLeft + rectWidth,
-        rectBottom: rectTop + rectHeight,
-        canvasWidth,
-        canvasHeight,
-      };
-    },
+    return this.adjustRatioCropzoneSize(resizeInfoMap[corner]);
+  },
 
-    /**
-     * Calc scaling dimension
-     * @param {Object} position - Mouse position
-     * @param {string} corner - corner type
-     * @returns {{left: number, top: number, width: number, height: number}}
-     * @private
-     */
-    _resizeCropZone({ x, y }, corner) {
-      const {
-        rectWidth,
-        rectHeight,
-        rectTop,
-        rectLeft,
-        rectBottom,
-        rectRight,
-        canvasWidth,
-        canvasHeight,
-      } = this._getCropzoneRectInfo();
+  /**
+   * Return the whether this cropzone is valid
+   * @returns {boolean}
+   */
+  isValid() {
+    return this.left >= 0 && this.top >= 0 && this.width > 0 && this.height > 0;
+  },
 
-      const resizeInfoMap = {
-        tl: {
-          width: rectRight - x,
-          height: rectBottom - y,
-          leftMaker: (newWidth) => rectRight - newWidth,
-          topMaker: (newHeight) => rectBottom - newHeight,
-          maxWidth: rectRight,
-          maxHeight: rectBottom,
-          scaleTo: getScaleBasis(rectLeft - x, rectTop - y),
-        },
-        tr: {
-          width: x - rectLeft,
-          height: rectBottom - y,
-          leftMaker: () => rectLeft,
-          topMaker: (newHeight) => rectBottom - newHeight,
-          maxWidth: canvasWidth - rectLeft,
-          maxHeight: rectBottom,
-          scaleTo: getScaleBasis(x - rectRight, rectTop - y),
-        },
-        mt: {
-          width: rectWidth,
-          height: rectBottom - y,
-          leftMaker: () => rectLeft,
-          topMaker: (newHeight) => rectBottom - newHeight,
-          maxWidth: canvasWidth - rectLeft,
-          maxHeight: rectBottom,
-          scaleTo: 'height',
-        },
-        ml: {
-          width: rectRight - x,
-          height: rectHeight,
-          leftMaker: (newWidth) => rectRight - newWidth,
-          topMaker: () => rectTop,
-          maxWidth: rectRight,
-          maxHeight: canvasHeight - rectTop,
-          scaleTo: 'width',
-        },
-        mr: {
-          width: x - rectLeft,
-          height: rectHeight,
-          leftMaker: () => rectLeft,
-          topMaker: () => rectTop,
-          maxWidth: canvasWidth - rectLeft,
-          maxHeight: canvasHeight - rectTop,
-          scaleTo: 'width',
-        },
-        mb: {
-          width: rectWidth,
-          height: y - rectTop,
-          leftMaker: () => rectLeft,
-          topMaker: () => rectTop,
-          maxWidth: canvasWidth - rectLeft,
-          maxHeight: canvasHeight - rectTop,
-          scaleTo: 'height',
-        },
-        bl: {
-          width: rectRight - x,
-          height: y - rectTop,
-          leftMaker: (newWidth) => rectRight - newWidth,
-          topMaker: () => rectTop,
-          maxWidth: rectRight,
-          maxHeight: canvasHeight - rectTop,
-          scaleTo: getScaleBasis(rectLeft - x, y - rectBottom),
-        },
-        br: {
-          width: x - rectLeft,
-          height: y - rectTop,
-          leftMaker: () => rectLeft,
-          topMaker: () => rectTop,
-          maxWidth: canvasWidth - rectLeft,
-          maxHeight: canvasHeight - rectTop,
-          scaleTo: getScaleBasis(x - rectRight, y - rectBottom),
-        },
-      };
+  /**
+   * Keydown event handler
+   * @param {{number}} keyCode - Event keyCode
+   * @private
+   */
+  _onKeyDown({ keyCode }) {
+    if (keyCode === keyCodes.SHIFT) {
+      this._withShiftKey = true;
+    }
+  },
 
-      return this.adjustRatioCropzoneSize(resizeInfoMap[corner]);
-    },
-
-    /**
-     * Return the whether this cropzone is valid
-     * @returns {boolean}
-     */
-    isValid() {
-      return this.left >= 0 && this.top >= 0 && this.width > 0 && this.height > 0;
-    },
-
-    /**
-     * Keydown event handler
-     * @param {{number}} keyCode - Event keyCode
-     * @private
-     */
-    _onKeyDown({ keyCode }) {
-      if (keyCode === keyCodes.SHIFT) {
-        this._withShiftKey = true;
-      }
-    },
-
-    /**
-     * Keyup event handler
-     * @param {{number}} keyCode - Event keyCode
-     * @private
-     */
-    _onKeyUp({ keyCode }) {
-      if (keyCode === keyCodes.SHIFT) {
-        this._withShiftKey = false;
-      }
-    },
-  }
-);
+  /**
+   * Keyup event handler
+   * @param {{number}} keyCode - Event keyCode
+   * @private
+   */
+  _onKeyUp({ keyCode }) {
+    if (keyCode === keyCodes.SHIFT) {
+      this._withShiftKey = false;
+    }
+  },
+});
 
 export default Cropzone;

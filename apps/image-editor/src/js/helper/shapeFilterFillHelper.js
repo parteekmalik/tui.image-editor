@@ -1,4 +1,4 @@
-import { fabric } from 'fabric';
+import * as fabric from 'fabric';
 import forEach from 'tui-code-snippet/collection/forEach';
 import extend from 'tui-code-snippet/object/extend';
 import resizeHelper from '@/helper/shapeResizeHelper';
@@ -543,11 +543,11 @@ function getRotatedDimension(shapeObj) {
  * @private
  */
 function makeFillImage(copiedCanvasElement, currentCanvasImageAngle, filterOption) {
-  const fillImage = new fabric.Image(copiedCanvasElement);
+  const fillImage = new fabric.FabricImage(copiedCanvasElement);
 
   forEach(extend({}, ...filterOption), (value, key) => {
     const fabricFilterClassName = capitalizeString(key);
-    const filter = new fabric.Image.filters[fabricFilterClassName]({
+    const filter = new fabric.filters[fabricFilterClassName]({
       [FILTER_OPTION_MAP[key]]: value,
     });
     fillImage.filters.push(filter);

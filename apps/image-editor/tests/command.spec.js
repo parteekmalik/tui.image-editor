@@ -1,4 +1,4 @@
-import { fabric } from 'fabric';
+import * as fabric from 'fabric';
 import Graphics from '@/graphics';
 import Invoker from '@/invoker';
 import commandFactory from '@/factory/command';
@@ -43,7 +43,7 @@ describe('commandFactory', () => {
     dimensions = { width: 100, height: 100 };
     graphics = new Graphics(document.createElement('canvas'));
     invoker = new Invoker();
-    mockImage = new fabric.Image(null, dimensions);
+    mockImage = new fabric.FabricImage(document.createElement('canvas'), dimensions);
 
     graphics.setCanvasImage('', mockImage);
     canvas = graphics.getCanvas();
@@ -134,7 +134,7 @@ describe('commandFactory', () => {
     let obj;
 
     beforeEach(() => {
-      canvas.getPointer = jest.fn();
+      canvas.getScenePoint = jest.fn();
       obj = new fabric.Rect({
         width: 10,
         height: 10,
@@ -195,7 +195,7 @@ describe('commandFactory', () => {
   });
 
   describe('loadImageCommand', () => {
-    const img = new fabric.Image(img1);
+    const img = new fabric.FabricImage(img1);
 
     beforeEach(() => {
       graphics.setCanvasImage('', null);
@@ -222,7 +222,8 @@ describe('commandFactory', () => {
     });
 
     it('should not include cropzone after running the LOAD_IMAGE command', async () => {
-      const objCropzone = new fabric.Object({ type: 'cropzone' });
+      const objCropzone = new fabric.FabricObject();
+      objCropzone.tuiType = 'cropzone';
 
       await invoker.execute(commands.ADD_OBJECT, graphics, objCropzone);
       await invoker.execute(commands.LOAD_IMAGE, graphics, 'image', img);
@@ -234,7 +235,8 @@ describe('commandFactory', () => {
     });
 
     it('should be true after LOAD_IMAGE command.', async () => {
-      const objCircle = new fabric.Object({ type: 'circle', evented: false });
+      const objCircle = new fabric.FabricObject({ evented: false });
+      objCircle.tuiType = 'circle';
 
       await invoker.execute(commands.ADD_OBJECT, graphics, objCircle);
       await invoker.execute(commands.LOAD_IMAGE, graphics, 'image', img);
@@ -254,7 +256,7 @@ describe('commandFactory', () => {
     });
 
     it('should restore to prev image', async () => {
-      const newImg = new fabric.Image(img2);
+      const newImg = new fabric.FabricImage(img2);
 
       await invoker.execute(commands.LOAD_IMAGE, graphics, 'image', img);
       await invoker.execute(commands.LOAD_IMAGE, graphics, 'newImage', newImg);
@@ -495,6 +497,7 @@ describe('commandFactory', () => {
     });
 
     it('should restore the position of the removed object in group', async () => {
+      group.remove(object, object2);
       const activeSelection = graphics.getActiveSelectionFromObjects(canvas.getObjects());
       graphics.setActiveObject(activeSelection);
 

@@ -68,7 +68,8 @@ class Flip extends Component {
     if (isChangingFlipY) {
       angle *= -1;
     }
-    canvasImage.rotate(parseFloat(angle)).setCoords(); // parseFloat for -0 to 0
+    canvasImage.rotate(parseFloat(angle)); // parseFloat for -0 to 0
+    canvasImage.setCoords();
   }
 
   /**
@@ -82,24 +83,22 @@ class Flip extends Component {
 
     if (isChangingFlipX) {
       canvas.forEachObject((obj) => {
-        obj
-          .set({
-            angle: parseFloat(obj.angle * -1), // parseFloat for -0 to 0
-            flipX: !obj.flipX,
-            left: canvas.width - obj.left,
-          })
-          .setCoords();
+        obj.set({
+          angle: parseFloat(obj.angle * -1), // parseFloat for -0 to 0
+          flipX: !obj.flipX,
+          left: canvas.width - obj.left,
+        });
+        obj.setCoords();
       });
     }
     if (isChangingFlipY) {
       canvas.forEachObject((obj) => {
-        obj
-          .set({
-            angle: parseFloat(obj.angle * -1), // parseFloat for -0 to 0
-            flipY: !obj.flipY,
-            top: canvas.height - obj.top,
-          })
-          .setCoords();
+        obj.set({
+          angle: parseFloat(obj.angle * -1), // parseFloat for -0 to 0
+          flipY: !obj.flipY,
+          top: canvas.height - obj.top,
+        });
+        obj.setCoords();
       });
     }
     canvas.renderAll();

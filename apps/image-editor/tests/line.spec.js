@@ -1,4 +1,4 @@
-import { fabric } from 'fabric';
+import * as fabric from 'fabric';
 import Graphics from '@/graphics';
 import Line from '@/component/line';
 import { eventNames } from '@/consts';
@@ -9,10 +9,10 @@ describe('Line', () => {
   beforeEach(() => {
     graphics = new Graphics(document.createElement('canvas'));
     canvas = graphics.getCanvas();
-    jest.spyOn(canvas, 'getPointer').mockReturnValue({ x: 30, y: 60 });
+    jest.spyOn(canvas, 'getScenePoint').mockReturnValue({ x: 30, y: 60 });
     line = new Line(graphics);
     line._line = new fabric.Line([10, 20, 10, 20]);
-    mockImage = new fabric.Image();
+    mockImage = new fabric.FabricImage(document.createElement('canvas'));
     graphics.setCanvasImage('mockImage', mockImage);
     fEvent = { e: {} };
   });

@@ -1,5 +1,6 @@
 import commandFactory from '@/factory/command';
 import { componentNames, commandNames } from '@/consts';
+import { getFabricObjectType } from '@/util';
 
 const { IMAGE_LOADER } = componentNames;
 
@@ -16,9 +17,11 @@ const command = {
   execute(graphics, imageName, imgUrl) {
     const loader = graphics.getComponent(IMAGE_LOADER);
     const prevImage = loader.getCanvasImage();
-    const prevImageWidth = prevImage ? prevImage.width : 0;
-    const prevImageHeight = prevImage ? prevImage.height : 0;
-    const objects = graphics.removeAll(true).filter((objectItem) => objectItem.type !== 'cropzone');
+    const prevImageWidth = prevImage ? Number(prevImage.width) || 0 : 0;
+    const prevImageHeight = prevImage ? Number(prevImage.height) || 0 : 0;
+    const objects = graphics
+      .removeAll(true)
+      .filter((objectItem) => getFabricObjectType(objectItem) !== 'cropzone');
 
     objects.forEach((objectItem) => {
       objectItem.evented = true;
@@ -33,8 +36,8 @@ const command = {
     return loader.load(imageName, imgUrl).then((newImage) => ({
       oldWidth: prevImageWidth,
       oldHeight: prevImageHeight,
-      newWidth: newImage.width,
-      newHeight: newImage.height,
+      newWidth: Number(newImage.width) || 0,
+      newHeight: Number(newImage.height) || 0,
     }));
   },
 

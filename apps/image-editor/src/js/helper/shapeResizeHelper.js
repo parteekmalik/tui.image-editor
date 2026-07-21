@@ -142,10 +142,11 @@ function adjustDimensionOnScaling(shape) {
  * @ignore
  */
 function adjustDimensionOnMouseMove(pointer, shape) {
-  const { type, strokeWidth, startPoint: origin } = shape;
+  const { strokeWidth, startPoint: origin } = shape;
+  const type = shape.tuiType || shape.type;
   const divisor = DIVISOR[type];
   const dimensionKeys = DIMENSION_KEYS[type];
-  const isTriangle = !!(shape.type === 'triangle');
+  const isTriangle = type === 'triangle';
   const options = {};
   let width = Math.abs(origin.x - pointer.x) / divisor;
   let height = Math.abs(origin.y - pointer.y) / divisor;

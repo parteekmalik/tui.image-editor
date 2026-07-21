@@ -1,4 +1,4 @@
-import { fabric } from 'fabric';
+import * as fabric from 'fabric';
 import Graphics from '@/graphics';
 import Rotation from '@/component/rotation';
 
@@ -12,7 +12,7 @@ describe('Rotation', () => {
   });
 
   beforeEach(() => {
-    mockImage = new fabric.Image();
+    mockImage = new fabric.FabricImage(document.createElement('canvas'));
     graphics.setCanvasImage('mockImage', mockImage);
   });
 

@@ -1,4 +1,4 @@
-import { fabric } from 'fabric';
+import * as fabric from 'fabric';
 import Graphics from '@/graphics';
 import Text from '@/component/text';
 
@@ -12,7 +12,7 @@ describe('Text', () => {
   });
 
   beforeEach(() => {
-    mockImage = new fabric.Image();
+    mockImage = new fabric.FabricImage(document.createElement('canvas'));
     graphics.setCanvasImage('mockImage', mockImage);
   });
 
@@ -116,7 +116,7 @@ describe('Text', () => {
   });
 
   it('should change size of selected text object', () => {
-    const obj = new fabric.Text('test');
+    const obj = new fabric.FabricText('test');
     const scale = 10;
     const { fontSize } = obj;
 

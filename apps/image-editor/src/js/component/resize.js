@@ -73,7 +73,8 @@ class Resize extends Component {
     };
 
     if (scaleX !== scaleValues.scaleX || scaleY !== scaleValues.scaleY) {
-      canvasImage.set(scaleValues).setCoords();
+      canvasImage.set(scaleValues);
+      canvasImage.setCoords();
 
       this._dimensions = {
         width: canvasImage.width * canvasImage.scaleX,

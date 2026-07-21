@@ -1,4 +1,4 @@
-import { fabric } from 'fabric';
+import * as fabric from 'fabric';
 import ImageEditor from '@/imageEditor';
 
 import '@/command/loadImage';
@@ -16,7 +16,7 @@ describe('UI', () => {
       },
     });
     actions = imageEditorMock.getActions();
-    mockImage = new fabric.Image();
+    mockImage = new fabric.FabricImage(document.createElement('canvas'));
     imageEditorMock._graphics.setCanvasImage('mockImage', mockImage);
   });
 

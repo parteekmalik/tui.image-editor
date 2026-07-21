@@ -1,4 +1,4 @@
-import { fabric } from 'fabric';
+import * as fabric from 'fabric';
 import ImageEditor from '@/imageEditor';
 import '@/command/loadImage';
 
@@ -12,7 +12,7 @@ describe('DrawingMode', () => {
       cssMaxWidth: 700,
       cssMaxHeight: 500,
     });
-    const image = new fabric.Image(img);
+    const image = new fabric.FabricImage(img);
 
     await imageEditor.loadImageFromURL(image, 'sampleImage');
   });

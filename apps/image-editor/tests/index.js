@@ -1,3 +1,3 @@
-import { fabric } from 'fabric';
+import * as fabric from 'fabric';
 
-fabric.Object.prototype.objectCaching = false;
+fabric.FabricObject.ownDefaults.objectCaching = false;

@@ -1,4 +1,4 @@
-import { fabric } from 'fabric';
+import * as fabric from 'fabric';
 
 /**
  * Sharpen object
@@ -6,24 +6,13 @@ import { fabric } from 'fabric';
  * @extends {fabric.Image.filters.Convolute}
  * @ignore
  */
-const Sharpen = fabric.util.createClass(
-  fabric.Image.filters.Convolute,
-  /** @lends Convolute.prototype */ {
-    /**
-     * Filter type
-     * @param {String} type
-     * @default
-     */
-    type: 'Sharpen',
-
-    /**
-     * constructor
-     * @override
-     */
-    initialize() {
-      this.matrix = [0, -1, 0, -1, 5, -1, 0, -1, 0];
-    },
+class Sharpen extends fabric.filters.Convolute {
+  constructor() {
+    super({ matrix: [0, -1, 0, -1, 5, -1, 0, -1, 0] });
   }
-);
+}
+
+Sharpen.type = 'Sharpen';
+fabric.classRegistry.setClass(Sharpen);
 
 export default Sharpen;

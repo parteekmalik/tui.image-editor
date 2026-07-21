@@ -1,4 +1,4 @@
-import { fabric } from 'fabric';
+import * as fabric from 'fabric';
 import Component from '@/interface/component';
 import { componentNames } from '@/consts';
 
@@ -39,7 +39,8 @@ class Rotation extends Component {
 
     const canvasImage = this.getCanvasImage();
     const oldImageCenter = canvasImage.getCenterPoint();
-    canvasImage.set({ angle }).setCoords();
+    canvasImage.set({ angle });
+    canvasImage.setCoords();
     this.adjustCanvasDimension();
     const newImageCenter = canvasImage.getCenterPoint();
     this._rotateForEachObject(oldImageCenter, newImageCenter, angle - oldAngle);

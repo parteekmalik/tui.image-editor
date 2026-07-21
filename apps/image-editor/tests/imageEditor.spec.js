@@ -1,4 +1,4 @@
-import { fabric } from 'fabric';
+import * as fabric from 'fabric';
 import ImageEditor from '@/imageEditor';
 import * as util from '@/util';
 import { eventNames, keyCodes } from '@/consts';
@@ -43,7 +43,7 @@ describe('ImageEditor', () => {
 
     it('should be fire at object is rotated', () => {
       const canvas = imageEditor._graphics.getCanvas();
-      const obj = new fabric.Object({});
+      const obj = new fabric.FabricObject({});
       canvas.add(obj);
       imageEditor.fire = jest.fn();
 

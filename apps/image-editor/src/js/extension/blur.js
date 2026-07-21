@@ -1,4 +1,4 @@
-import { fabric } from 'fabric';
+import * as fabric from 'fabric';
 
 /**
  * Blur object
@@ -6,24 +6,13 @@ import { fabric } from 'fabric';
  * @extends {fabric.Image.filters.Convolute}
  * @ignore
  */
-const Blur = fabric.util.createClass(
-  fabric.Image.filters.Convolute,
-  /** @lends Convolute.prototype */ {
-    /**
-     * Filter type
-     * @param {String} type
-     * @default
-     */
-    type: 'Blur',
-
-    /**
-     * constructor
-     * @override
-     */
-    initialize() {
-      this.matrix = [1 / 9, 1 / 9, 1 / 9, 1 / 9, 1 / 9, 1 / 9, 1 / 9, 1 / 9, 1 / 9];
-    },
+class Blur extends fabric.filters.Convolute {
+  constructor() {
+    super({ matrix: [1 / 9, 1 / 9, 1 / 9, 1 / 9, 1 / 9, 1 / 9, 1 / 9, 1 / 9, 1 / 9] });
   }
-);
+}
+
+Blur.type = 'Blur';
+fabric.classRegistry.setClass(Blur);
 
 export default Blur;

@@ -1,4 +1,4 @@
-import { fabric } from 'fabric';
+import * as fabric from 'fabric';
 import Component from '@/interface/component';
 import { componentNames } from '@/consts';
 
@@ -139,14 +139,12 @@ class CopyStamp extends Component {
     const canvas = this.getCanvas();
     const radius = this.brushWidth / 2;
 
-    const CursorCircle = fabric.util.createClass(fabric.Circle, {
-      type: 'copyStampCursor',
-
-      initialize(options) {
-        this.callSuper('initialize', options);
+    class CursorCircle extends fabric.Circle {
+      constructor(options) {
+        super(options);
         this.hasSource = false;
         this.showImage = true;
-      },
+      }
 
       _render(ctx) {
         const { canvas: fabricCanvas } = this;
@@ -189,8 +187,10 @@ class CopyStamp extends Component {
         ctx.stroke();
 
         ctx.restore();
-      },
-    });
+      }
+    }
+
+    CursorCircle.type = 'copyStampCursor';
 
     this._cursorCircle = new CursorCircle({
       radius,
@@ -207,20 +207,6 @@ class CopyStamp extends Component {
     });
 
     canvas.add(this._cursorCircle);
-    canvas._copyStampCursorCircle = this._cursorCircle;
-
-    if (!canvas._originalFindTarget) {
-      canvas._originalFindTarget = canvas.findTarget;
-    }
-    canvas.findTarget = function (e, skipGroup) {
-      const target = canvas._originalFindTarget.call(this, e, skipGroup);
-
-      if (target === canvas._copyStampCursorCircle) {
-        return null;
-      }
-
-      return target;
-    };
   }
 
   /**
@@ -252,7 +238,7 @@ class CopyStamp extends Component {
       this._cursorCircle.setCoords();
 
       const canvas = this.getCanvas();
-      canvas.bringToFront(this._cursorCircle);
+      canvas.bringObjectToFront(this._cursorCircle);
     }
   }
 
@@ -305,15 +291,7 @@ class CopyStamp extends Component {
 
     const fullImageDataURL = canvas.toDataURL();
 
-    this._sourceSnapshot = new Promise((resolve, reject) => {
-      fabric.Image.fromURL(fullImageDataURL, (img) => {
-        if (img) {
-          resolve(img);
-        } else {
-          reject(new Error('Failed to create fabric image'));
-        }
-      });
-    });
+    this._sourceSnapshot = fabric.FabricImage.fromURL(fullImageDataURL);
     await this._sourceSnapshot;
 
     if (this._cursorCircle) {
@@ -354,7 +332,7 @@ class CopyStamp extends Component {
    */
   _handleCursorMove(fabricEvent) {
     const canvas = this.getCanvas();
-    const mousePosition = canvas.getPointer(fabricEvent.e);
+    const mousePosition = canvas.getScenePoint(fabricEvent.e);
 
     this._updateCursorCircle({ position: mousePosition });
   }
@@ -366,7 +344,7 @@ class CopyStamp extends Component {
    */
   async _handleMouseDown(fabricEvent) {
     const canvas = this.getCanvas();
-    const mousePosition = canvas.getPointer(fabricEvent.e);
+    const mousePosition = canvas.getScenePoint(fabricEvent.e);
 
     if (fabricEvent.e.ctrlKey || fabricEvent.e.metaKey) {
       this._sourcePoint = mousePosition;
@@ -528,7 +506,7 @@ class CopyStamp extends Component {
             pathHeight
           );
 
-          const img = new fabric.Image(tempCanvas);
+          const img = new fabric.FabricImage(tempCanvas);
           if (!img) {
             reject(new Error('Failed to create fabric image from cropped data'));
 
@@ -574,7 +552,7 @@ class CopyStamp extends Component {
           finalContext.drawImage(maskCanvas, 0, 0);
           finalContext.restore();
 
-          const clonedImage = new fabric.Image(finalCanvas, {
+          const clonedImage = new fabric.FabricImage(finalCanvas, {
             left: pathLeft,
             top: pathTop,
             selectable: false,

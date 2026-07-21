@@ -1,5 +1,6 @@
-import { fabric } from 'fabric';
+import * as fabric from 'fabric';
 import extend from 'tui-code-snippet/object/extend';
+import { getFabricObjectType } from '@/util';
 
 /**
  * Cached selection's info
@@ -36,7 +37,7 @@ export function getCachedUndoDataForDimension() {
 export function makeSelectionUndoData(obj, undoDatumMaker) {
   let undoData;
 
-  if (obj.type === 'activeSelection') {
+  if (obj instanceof fabric.ActiveSelection || getFabricObjectType(obj) === 'activeSelection') {
     undoData = obj.getObjects().map((item) => {
       const { angle, left, top, scaleX, scaleY, width, height } = item;
 

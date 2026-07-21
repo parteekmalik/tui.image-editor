@@ -1,4 +1,4 @@
-import { fabric } from 'fabric';
+import * as fabric from 'fabric';
 import Graphics from '@/graphics';
 import { stamp } from '@/util';
 import { drawingModes, componentNames as components } from '@/consts';
@@ -62,11 +62,12 @@ describe('Graphics', () => {
   it('should deactivate all objects', () => {
     const triangle = new fabric.Triangle({ width: 20, height: 30 });
 
-    canvas.add(triangle).setActiveObject(triangle);
+    canvas.add(triangle);
+    canvas.setActiveObject(triangle);
     expect(canvas.getActiveObject()).not.toBeNull();
 
     graphics.deactivateAll();
-    expect(canvas.getActiveObject()).toBeNull();
+    expect(canvas.getActiveObject()).toBeFalsy();
   });
 
   it('should render objects', () => {
@@ -175,8 +176,8 @@ describe('Graphics', () => {
     let targetObject1, targetObject2;
 
     beforeEach(() => {
-      targetObject1 = new fabric.Object({});
-      targetObject2 = new fabric.Object({});
+      targetObject1 = new fabric.FabricObject({});
+      targetObject2 = new fabric.FabricObject({});
 
       canvas.add(targetObject1);
       canvas.add(targetObject2);
@@ -190,6 +191,7 @@ describe('Graphics', () => {
       await graphics.pasteObject();
 
       expect(canvas.getObjects()).toHaveLength(4);
+      expect(canvas.getActiveObject().getObjects()).toHaveLength(2);
     });
 
     it('should be duplicated', async () => {

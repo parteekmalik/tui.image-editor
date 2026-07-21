@@ -1,4 +1,4 @@
-import { fabric } from 'fabric';
+import * as fabric from 'fabric';
 import Graphics from '@/graphics';
 import Shape from '@/component/shape';
 import { resize } from '@/helper/shapeResizeHelper';
@@ -14,7 +14,7 @@ describe('Shape', () => {
   });
 
   beforeEach(() => {
-    mockImage = new fabric.Image();
+    mockImage = new fabric.FabricImage(document.createElement('canvas'));
     graphics.setCanvasImage('mockImage', mockImage);
     fEvent = { e: {} };
   });
@@ -26,7 +26,7 @@ describe('Shape', () => {
   });
 
   it('should be calculated correctly.', () => {
-    const pointer = canvas.getPointer(fEvent.e);
+    const pointer = canvas.getScenePoint(fEvent.e);
     const settings = {
       strokeWidth: 0,
       type: 'rect',
@@ -62,7 +62,7 @@ describe('Shape', () => {
     shape.add('circle');
     [shapeObj] = canvas.getObjects();
 
-    expect(shapeObj.get('type')).toBe('circle');
+    expect(shapeObj.get('type')).toBe('ellipse');
   });
 
   it('should be created on canvas(triangle)', () => {
@@ -121,7 +121,7 @@ describe('Shape', () => {
     shape.add('circle', settings);
     [shapeObj] = canvas.getObjects();
 
-    expect(shapeObj).toMatchObject(settings);
+    expect(shapeObj).toMatchObject({ ...settings, type: 'ellipse', tuiType: 'circle' });
   });
 
   it('should be set the triangle object when add() is called with the options', () => {
@@ -169,7 +169,7 @@ describe('Shape', () => {
   describe('Fill - filter type', () => {
     beforeEach(() => {
       getCachedCanvasImageElement(canvas, true);
-      mockImage = new fabric.Image();
+      mockImage = new fabric.FabricImage(document.createElement('canvas'));
       graphics.setCanvasImage('mockImage', mockImage);
       shape.add('rect', {
         strokeWidth: 0,
@@ -186,7 +186,7 @@ describe('Shape', () => {
     });
 
     it('should be executed when a movement, rotation, and scaling event of a filter type fill is applied', () => {
-      jest.spyOn(canvas, 'getPointer').mockReturnValue({ x: 10, y: 10 });
+      jest.spyOn(canvas, 'getScenePoint').mockReturnValue({ x: 10, y: 10 });
       const _resetPositionFillFilterSpy = jest.spyOn(shape, '_resetPositionFillFilter');
       shapeObj.fire('moving');
       shapeObj.fire('rotating');
@@ -276,7 +276,7 @@ describe('Shape', () => {
     });
 
     it('should be set to "left" and "top" when the mouse direction is in 1th quadrant', () => {
-      jest.spyOn(canvas, 'getPointer').mockReturnValue({ x: 200, y: 120 });
+      jest.spyOn(canvas, 'getScenePoint').mockReturnValue({ x: 200, y: 120 });
 
       shape._onFabricMouseMove(fEvent);
 
@@ -284,7 +284,7 @@ describe('Shape', () => {
     });
 
     it('should be set to "right" and "top" when the mouse direction is in 2th quadrant', () => {
-      jest.spyOn(canvas, 'getPointer').mockReturnValue({ x: 80, y: 100 });
+      jest.spyOn(canvas, 'getScenePoint').mockReturnValue({ x: 80, y: 100 });
 
       shape._onFabricMouseMove(fEvent);
 
@@ -292,7 +292,7 @@ describe('Shape', () => {
     });
 
     it('should be set to "right" and "bottom" when the mouse direction is in 3th quadrant', () => {
-      jest.spyOn(canvas, 'getPointer').mockReturnValue({ x: 80, y: 80 });
+      jest.spyOn(canvas, 'getScenePoint').mockReturnValue({ x: 80, y: 80 });
 
       shape._onFabricMouseMove(fEvent);
 
@@ -300,7 +300,7 @@ describe('Shape', () => {
     });
 
     it('should be set to "left" and "bottom" when the mouse direction is in 4th quadrant', () => {
-      jest.spyOn(canvas, 'getPointer').mockReturnValue({ x: 200, y: 80 });
+      jest.spyOn(canvas, 'getScenePoint').mockReturnValue({ x: 200, y: 80 });
 
       shape._onFabricMouseMove(fEvent);
 
@@ -318,7 +318,7 @@ describe('Shape', () => {
     });
 
     it('should be the same as start point when the drawing shape is in 1th quadrant', () => {
-      jest.spyOn(canvas, 'getPointer').mockReturnValue({ x: 200, y: 120 });
+      jest.spyOn(canvas, 'getScenePoint').mockReturnValue({ x: 200, y: 120 });
       startPoint = shapeObj.getPointByOrigin('left', 'top');
 
       shape._onFabricMouseMove(fEvent);
@@ -328,7 +328,7 @@ describe('Shape', () => {
     });
 
     it('should be the same as start point when the drawing shape is in 2th quadrant', () => {
-      jest.spyOn(canvas, 'getPointer').mockReturnValue({ x: 80, y: 120 });
+      jest.spyOn(canvas, 'getScenePoint').mockReturnValue({ x: 80, y: 120 });
 
       startPoint = shapeObj.getPointByOrigin('right', 'top');
 
@@ -339,7 +339,7 @@ describe('Shape', () => {
     });
 
     it('should be the same as start point when the drawing shape is in 3th quadrant', () => {
-      jest.spyOn(canvas, 'getPointer').mockReturnValue({ x: 80, y: 80 });
+      jest.spyOn(canvas, 'getScenePoint').mockReturnValue({ x: 80, y: 80 });
 
       startPoint = shapeObj.getPointByOrigin('right', 'bottom');
 
@@ -350,7 +350,7 @@ describe('Shape', () => {
     });
 
     it('should be the same as start point when the drawing shape is in 4th quadrant', () => {
-      jest.spyOn(canvas, 'getPointer').mockReturnValue({ x: 120, y: 80 });
+      jest.spyOn(canvas, 'getScenePoint').mockReturnValue({ x: 120, y: 80 });
 
       startPoint = shapeObj.getPointByOrigin('left', 'bottom');
 
@@ -366,7 +366,7 @@ describe('Shape', () => {
     shape._withShiftKey = true;
     [shapeObj] = canvas.getObjects();
     shape._shapeObj = shapeObj;
-    jest.spyOn(canvas, 'getPointer').mockReturnValue({ x: 200, y: 100 });
+    jest.spyOn(canvas, 'getScenePoint').mockReturnValue({ x: 200, y: 100 });
 
     shape._onFabricMouseMove(fEvent);
     shape._onFabricMouseUp();
@@ -379,7 +379,7 @@ describe('Shape', () => {
     shape._withShiftKey = true;
     [shapeObj] = canvas.getObjects();
     shape._shapeObj = shapeObj;
-    jest.spyOn(canvas, 'getPointer').mockReturnValue({ x: 100, y: 200 });
+    jest.spyOn(canvas, 'getScenePoint').mockReturnValue({ x: 100, y: 200 });
 
     shape._onFabricMouseMove(fEvent);
     shape._onFabricMouseUp();

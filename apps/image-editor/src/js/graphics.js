@@ -1,4 +1,4 @@
-import { fabric } from 'fabric';
+import * as fabric from 'fabric';
 import extend from 'tui-code-snippet/object/extend';
 import isArray from 'tui-code-snippet/type/isArray';
 import isString from 'tui-code-snippet/type/isString';
@@ -30,7 +30,7 @@ import {
   makeSelectionUndoDatum,
   setCachedUndoDataForDimension,
 } from '@/helper/selectionModifyHelper';
-import { getProperties, includes, isShape, stamp } from '@/util';
+import { getFabricObjectType, getProperties, includes, isShape, stamp } from '@/util';
 import {
   componentNames as components,
   eventNames as events,
@@ -287,9 +287,17 @@ class Graphics {
     const objects = [];
     const canvas = this._canvas;
     const target = this.getObject(id);
-    const isValidGroup = target && target.isType('group') && !target.isEmpty();
+    const isActiveSelection = target instanceof fabric.ActiveSelection;
+    const isValidGroup = target instanceof fabric.Group && !target.isEmpty();
 
-    if (isValidGroup) {
+    if (isActiveSelection) {
+      const selectedObjects = [...target.getObjects()];
+      canvas.discardActiveObject();
+      selectedObjects.forEach((obj) => {
+        objects.push(obj);
+        canvas.remove(obj);
+      });
+    } else if (isValidGroup) {
       canvas.discardActiveObject(); // restore states for each objects
       target.forEachObject((obj) => {
         objects.push(obj);
@@ -326,7 +334,7 @@ class Graphics {
    * @returns {Object} active object or group instance
    */
   getActiveObject() {
-    return this._canvas._activeObject;
+    return this._canvas.getActiveObject();
   }
 
   /**
@@ -335,16 +343,11 @@ class Graphics {
    */
   getActiveObjectIdForRemove() {
     const activeObject = this.getActiveObject();
-    const { type, left, top } = activeObject;
+    const type = getFabricObjectType(activeObject);
     const isSelection = type === 'activeSelection';
 
     if (isSelection) {
-      const group = new fabric.Group([...activeObject.getObjects()], {
-        left,
-        top,
-      });
-
-      return this._addFabricObject(group);
+      return this._addFabricObject(activeObject);
     }
 
     return this.getObjectId(activeObject);
@@ -365,9 +368,11 @@ class Graphics {
    * @returns {Object} active group object instance
    */
   getActiveObjects() {
-    const activeObject = this._canvas._activeObject;
+    const activeObject = this._canvas.getActiveObject();
 
-    return activeObject && activeObject.type === 'activeSelection' ? activeObject : null;
+    return activeObject && getFabricObjectType(activeObject) === 'activeSelection'
+      ? activeObject
+      : null;
   }
 
   /**
@@ -634,7 +639,8 @@ class Graphics {
       return;
     }
 
-    canvasImage.set(setting).setCoords();
+    canvasImage.set(setting);
+    canvasImage.setCoords();
     if (withRendering) {
       this._canvas.renderAll();
     }
@@ -677,21 +683,15 @@ class Graphics {
    * @param {string} imgUrl - Image url to make object
    * @returns {Promise}
    */
-  addImageObject(imgUrl) {
+  async addImageObject(imgUrl) {
     const callback = this._callbackAfterLoadingImageObject.bind(this);
-
-    return new Promise((resolve) => {
-      fabric.Image.fromURL(
-        imgUrl,
-        (image) => {
-          callback(image);
-          resolve(this.createObjectProperties(image));
-        },
-        {
-          crossOrigin: 'Anonymous',
-        }
-      );
+    const image = await fabric.FabricImage.fromURL(imgUrl, {
+      crossOrigin: 'anonymous',
     });
+
+    callback(image);
+
+    return this.createObjectProperties(image);
   }
 
   /**
@@ -699,7 +699,9 @@ class Graphics {
    * @returns {Object} {left, top}
    */
   getCenter() {
-    return this._canvas.getCenter();
+    const { x: left, y: top } = this._canvas.getCenterPoint();
+
+    return { left, top };
   }
 
   /**
@@ -851,10 +853,10 @@ class Graphics {
     const props = {};
 
     if (isString(keys)) {
-      props[keys] = object[keys];
+      props[keys] = keys === 'type' ? getFabricObjectType(object) : object[keys];
     } else if (isArray(keys)) {
       forEachArray(keys, (value) => {
-        props[value] = object[value];
+        props[value] = value === 'type' ? getFabricObjectType(object) : object[value];
       });
     } else {
       forEachOwnProperties(keys, (value, key) => {
@@ -921,8 +923,8 @@ class Graphics {
     const image = this.getCanvasImage();
 
     return {
-      width: image ? image.width : 0,
-      height: image ? image.height : 0,
+      width: image ? Number(image.width) || 0 : 0,
+      height: image ? Number(image.height) || 0 : 0,
     };
   }
 
@@ -956,7 +958,7 @@ class Graphics {
    * @private
    */
   _setObjectCachingToFalse() {
-    fabric.Object.prototype.objectCaching = false;
+    fabric.FabricObject.ownDefaults.objectCaching = false;
   }
 
   /**
@@ -983,6 +985,7 @@ class Graphics {
       containerClass: 'tui-image-editor-canvas-container',
       enableRetinaScaling: false,
     });
+    this._canvas.freeDrawingBrush = new fabric.PencilBrush(this._canvas);
   }
 
   /**
@@ -1084,7 +1087,8 @@ class Graphics {
       crossOrigin: 'Anonymous',
     });
 
-    this.getCanvas().add(obj).setActiveObject(obj);
+    this.getCanvas().add(obj);
+    this.getCanvas().setActiveObject(obj);
   }
 
   /**
@@ -1115,10 +1119,10 @@ class Graphics {
    */
   _onMouseDown(fEvent) {
     const { e: event, target } = fEvent;
-    const originPointer = this._canvas.getPointer(event);
+    const originPointer = this._canvas.getScenePoint(event);
 
     if (target) {
-      const { type } = target;
+      const type = getFabricObjectType(target);
       const undoData = makeSelectionUndoData(target, (item) =>
         makeSelectionUndoDatum(this.getObjectId(item), item, type === 'activeSelection')
       );
@@ -1187,7 +1191,7 @@ class Graphics {
    */
   _onObjectModified(fEvent) {
     const { target } = fEvent;
-    if (target.type === 'activeSelection') {
+    if (getFabricObjectType(target) === 'activeSelection') {
       const items = target.getObjects();
 
       items.forEach((item) => item.fire('modifiedInGroup', target));
@@ -1328,14 +1332,14 @@ class Graphics {
     ];
     const props = {
       id: stamp(obj),
-      type: obj.type,
+      type: getFabricObjectType(obj),
     };
 
     extend(props, getProperties(obj, predefinedKeys));
 
-    if (includes(['i-text', 'text'], obj.type)) {
+    if (includes(['i-text', 'text'], props.type)) {
       extend(props, this._createTextProperties(obj, props));
-    } else if (includes(['rect', 'triangle', 'circle'], obj.type)) {
+    } else if (includes(['rect', 'triangle', 'circle'], props.type)) {
       const shapeComp = this.getComponent(components.SHAPE);
       extend(props, {
         fill: shapeComp.makeFillPropertyForUserEvent(obj),
@@ -1408,8 +1412,8 @@ class Graphics {
     }
 
     const targetObject = this.targetObjectForCopyPaste;
-    const isGroupSelect = targetObject.type === 'activeSelection';
-    const targetObjects = isGroupSelect ? targetObject.getObjects() : [targetObject];
+    const isGroupSelect = getFabricObjectType(targetObject) === 'activeSelection';
+    const targetObjects = isGroupSelect ? [...targetObject.getObjects()] : [targetObject];
     let newTargetObject = null;
 
     this.discardSelection();
@@ -1490,17 +1494,14 @@ class Graphics {
    * @returns {Promise}
    * @private
    */
-  _copyFabricObject(targetObject) {
-    return new Promise((resolve) => {
-      targetObject.clone((cloned) => {
-        const shapeComp = this.getComponent(components.SHAPE);
-        if (isShape(cloned)) {
-          shapeComp.processForCopiedObject(cloned, targetObject);
-        }
+  async _copyFabricObject(targetObject) {
+    const cloned = await targetObject.clone(['customProps', 'arrowType']);
+    const shapeComp = this.getComponent(components.SHAPE);
+    if (isShape(cloned)) {
+      shapeComp.processForCopiedObject(cloned, targetObject);
+    }
 
-        resolve(cloned);
-      });
-    });
+    return cloned;
   }
 
   /**

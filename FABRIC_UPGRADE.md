@@ -55,5 +55,13 @@ For each Fabric major:
 
 The core image editor is upgraded to Fabric 5.5.2. The migration replaces the removed
 `target` property on selection events with `selected[0]` and accepts Fabric 5's updated
-serialized text defaults. Jest, browser, type, lint, format, and production build checks
-pass. Manual Brezel validation and publishing remain before starting Fabric 6.
+serialized text defaults.
+
+## Fabric 6 status
+
+The core image editor is upgraded to Fabric 6.9.1. The migration uses Fabric's named
+module exports, native classes for custom objects and filters, Promise-based loading and
+cloning, explicit free-drawing brushes, and the new pointer, stack, selection, and group
+APIs. The editor keeps its existing lowercase public object types while Fabric uses its
+new internal class names. Jest, browser, type, lint, format, and production build checks
+pass. Manual Brezel validation and publishing remain before starting Fabric 7.

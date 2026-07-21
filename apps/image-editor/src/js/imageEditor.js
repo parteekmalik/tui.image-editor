@@ -1,4 +1,4 @@
-import { fabric } from 'fabric';
+import * as fabric from 'fabric';
 import extend from 'tui-code-snippet/object/extend';
 import isUndefined from 'tui-code-snippet/type/isUndefined';
 import forEach from 'tui-code-snippet/collection/forEach';
@@ -244,7 +244,7 @@ class ImageEditor {
       this.setReAction();
       this._attachColorPickerInputBoxEvents();
     }
-    fabric.enableGLFiltering = false;
+    fabric.config.enableGLFiltering = false;
   }
 
   _attachColorPickerInputBoxEvents() {

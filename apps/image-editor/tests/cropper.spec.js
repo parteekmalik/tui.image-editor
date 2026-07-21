@@ -1,4 +1,4 @@
-import { fabric } from 'fabric';
+import * as fabric from 'fabric';
 import Graphics from '@/graphics';
 import Cropper from '@/component/cropper';
 import { eventNames, CROPZONE_DEFAULT_OPTIONS } from '@/consts';
@@ -65,7 +65,7 @@ describe('Cropper', () => {
 
     beforeEach(() => {
       fEvent = { e: {} };
-      jest.spyOn(canvas, 'getPointer').mockReturnValue({ x: 10, y: 20 });
+      jest.spyOn(canvas, 'getScenePoint').mockReturnValue({ x: 10, y: 20 });
     });
 
     it('should set "selection" to false', () => {
@@ -84,7 +84,7 @@ describe('Cropper', () => {
 
   describe('onFabricMouseMove()', () => {
     beforeEach(() => {
-      jest.spyOn(canvas, 'getPointer').mockReturnValue({ x: 10, y: 20 });
+      jest.spyOn(canvas, 'getScenePoint').mockReturnValue({ x: 10, y: 20 });
       jest.spyOn(canvas, 'getWidth').mockReturnValue(100);
       jest.spyOn(canvas, 'getHeight').mockReturnValue(200);
     });

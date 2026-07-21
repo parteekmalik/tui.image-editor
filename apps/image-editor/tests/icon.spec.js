@@ -1,4 +1,4 @@
-import { fabric } from 'fabric';
+import * as fabric from 'fabric';
 import Graphics from '@/graphics';
 import Icon from '@/component/icon';
 
@@ -12,7 +12,10 @@ describe('Icon', () => {
   });
 
   beforeEach(() => {
-    mockImage = new fabric.Image();
+    const imageElement = document.createElement('canvas');
+    imageElement.width = 300;
+    imageElement.height = 150;
+    mockImage = new fabric.FabricImage(imageElement);
     graphics.setCanvasImage('mockImage', mockImage);
   });
 
@@ -36,7 +39,7 @@ describe('Icon', () => {
     });
 
     it('should increase when dragging to the right-down from the starting point', () => {
-      jest.spyOn(canvas, 'getPointer').mockReturnValue({ x: 500, y: 500 });
+      jest.spyOn(canvas, 'getScenePoint').mockReturnValue({ x: 500, y: 500 });
 
       icon._onFabricMouseMove(fEvent);
 
@@ -44,7 +47,7 @@ describe('Icon', () => {
     });
 
     it('should increase when dragging to the left-up from the starting point', () => {
-      jest.spyOn(canvas, 'getPointer').mockReturnValue({ x: 100, y: 100 });
+      jest.spyOn(canvas, 'getScenePoint').mockReturnValue({ x: 100, y: 100 });
 
       icon._onFabricMouseMove(fEvent);
 
@@ -68,13 +71,15 @@ describe('Icon', () => {
     const { left, top, strokeWidth } = canvas.getActiveObject();
     const halfStrokeWidth = strokeWidth / 2;
 
-    expect({ x: left + halfStrokeWidth, y: top + halfStrokeWidth }).toEqual(centerPos);
+    expect(centerPos).toMatchObject({ x: left + halfStrokeWidth, y: top + halfStrokeWidth });
   });
 
   it('should create the arrow icon when parameter value is arrow', () => {
     const path = icon._pathMap.arrow;
 
-    const createIconSpy = jest.spyOn(icon, '_createIcon').mockReturnValue(new fabric.Object({}));
+    const createIconSpy = jest
+      .spyOn(icon, '_createIcon')
+      .mockReturnValue(new fabric.FabricObject({}));
 
     icon.add('arrow');
 
@@ -84,7 +89,9 @@ describe('Icon', () => {
   it('should create the cancel icon when parameter value is cancel', () => {
     const path = icon._pathMap.cancel;
 
-    const createIconSpy = jest.spyOn(icon, '_createIcon').mockReturnValue(new fabric.Object({}));
+    const createIconSpy = jest
+      .spyOn(icon, '_createIcon')
+      .mockReturnValue(new fabric.FabricObject({}));
 
     icon.add('cancel');
 

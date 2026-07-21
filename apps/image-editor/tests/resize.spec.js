@@ -1,4 +1,4 @@
-import { fabric } from 'fabric';
+import * as fabric from 'fabric';
 import Graphics from '@/graphics';
 import Resize from '@/component/resize';
 
@@ -11,7 +11,10 @@ describe('Resize', () => {
   });
 
   beforeEach(() => {
-    mockImage = new fabric.Image(null, { width: 100, height: 100 });
+    mockImage = new fabric.FabricImage(document.createElement('canvas'), {
+      width: 100,
+      height: 100,
+    });
     graphics.setCanvasImage('mockImage', mockImage);
   });
 

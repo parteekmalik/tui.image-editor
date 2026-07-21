@@ -1,4 +1,4 @@
-import { fabric } from 'fabric';
+import * as fabric from 'fabric';
 
 /**
  * Emboss object
@@ -6,24 +6,13 @@ import { fabric } from 'fabric';
  * @extends {fabric.Image.filters.Convolute}
  * @ignore
  */
-const Emboss = fabric.util.createClass(
-  fabric.Image.filters.Convolute,
-  /** @lends Convolute.prototype */ {
-    /**
-     * Filter type
-     * @param {String} type
-     * @default
-     */
-    type: 'Emboss',
-
-    /**
-     * constructor
-     * @override
-     */
-    initialize() {
-      this.matrix = [1, 1, 1, 1, 0.7, -1, -1, -1, -1];
-    },
+class Emboss extends fabric.filters.Convolute {
+  constructor() {
+    super({ matrix: [1, 1, 1, 1, 0.7, -1, -1, -1, -1] });
   }
-);
+}
+
+Emboss.type = 'Emboss';
+fabric.classRegistry.setClass(Emboss);
 
 export default Emboss;

@@ -18,8 +18,8 @@ Object {
   "flipX": false,
   "flipY": false,
   "globalCompositeOperation": "source-over",
-  "height": 125.56,
-  "left": 104.79,
+  "height": 125.5623,
+  "left": 104.7878,
   "opacity": 1,
   "originX": "center",
   "originY": "center",
@@ -38,11 +38,11 @@ Object {
   "strokeMiterLimit": 4,
   "strokeUniform": false,
   "strokeWidth": 0,
-  "top": 36.82,
-  "type": "image",
-  "version": "5.5.2",
+  "top": 36.8203,
+  "type": "Image",
+  "version": "6.9.1",
   "visible": true,
-  "width": 128.03,
+  "width": 128.0275,
 }
 `;
 
@@ -85,8 +85,8 @@ Object {
   "strokeUniform": false,
   "strokeWidth": 0,
   "top": 40,
-  "type": "image",
-  "version": "5.5.2",
+  "type": "Image",
+  "version": "6.9.1",
   "visible": true,
   "width": 200,
 }

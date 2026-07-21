@@ -1,3 +1,4 @@
+import * as fabric from 'fabric';
 import Component from '@/interface/component';
 import { componentNames, rejectMessages } from '@/consts';
 
@@ -56,28 +57,23 @@ class ImageLoader extends Component {
    * @returns {Promise}
    * @private
    */
-  _setBackgroundImage(img) {
+  async _setBackgroundImage(img) {
     if (!img) {
       return Promise.reject(rejectMessages.loadImage);
     }
 
-    return new Promise((resolve, reject) => {
-      const canvas = this.getCanvas();
+    const canvas = this.getCanvas();
+    const image =
+      typeof img === 'string' ? await fabric.FabricImage.fromURL(img, imageOption) : img;
 
-      canvas.setBackgroundImage(
-        img,
-        () => {
-          const oImage = canvas.backgroundImage;
+    canvas.backgroundImage = image;
+    canvas.renderAll();
 
-          if (oImage && oImage.getElement()) {
-            resolve(oImage);
-          } else {
-            reject(rejectMessages.loadingImageFailed);
-          }
-        },
-        imageOption
-      );
-    });
+    if (!image.getElement()) {
+      return Promise.reject(rejectMessages.loadingImageFailed);
+    }
+
+    return image;
   }
 }
 

@@ -364,7 +364,34 @@ export function getFillTypeFromObject(shapeObj) {
  * @returns {boolean}
  */
 export function isShape(obj) {
-  return inArray(obj.get('type'), SHAPE_TYPE) >= 0;
+  return inArray(getFabricObjectType(obj), SHAPE_TYPE) >= 0;
+}
+
+/**
+ * Get the legacy object type exposed by the image editor API.
+ * @param {fabric.Object} obj - fabric object
+ * @returns {string}
+ */
+export function getFabricObjectType(obj) {
+  const typeMap = {
+    ActiveSelection: 'activeSelection',
+    activeselection: 'activeSelection',
+    Circle: 'circle',
+    Ellipse: 'circle',
+    ellipse: 'circle',
+    FabricImage: 'image',
+    Image: 'image',
+    IText: 'i-text',
+    Line: 'line',
+    Path: 'path',
+    Rect: 'rect',
+    Text: 'text',
+    Triangle: 'triangle',
+  };
+
+  const type = obj.type || (obj.get && obj.get('type'));
+
+  return obj.tuiType || typeMap[type] || type;
 }
 
 /**

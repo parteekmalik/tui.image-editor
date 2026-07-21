@@ -1,4 +1,4 @@
-import { fabric } from 'fabric';
+import * as fabric from 'fabric';
 import Cropzone from '@/extension/cropzone';
 
 describe('Cropzone', () => {

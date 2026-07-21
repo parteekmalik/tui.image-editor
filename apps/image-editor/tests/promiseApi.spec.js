@@ -1,4 +1,4 @@
-import { fabric } from 'fabric';
+import * as fabric from 'fabric';
 import ImageEditor from '@/imageEditor';
 import { stamp } from '@/util';
 import { rejectMessages } from '@/consts';
@@ -41,7 +41,7 @@ describe('Promise API', () => {
   });
 
   beforeEach(async () => {
-    const image = new fabric.Image(img);
+    const image = new fabric.FabricImage(img);
     await imageEditor.loadImageFromURL(image, 'sampleImage');
   });
 
@@ -82,7 +82,7 @@ describe('Promise API', () => {
     });
 
     const [object] = canvas.getObjects();
-    expect(object).toMatchObject({ type: 'triangle', width: 200, fill: '#FF0000' });
+    expect(object).toMatchObject({ tuiType: 'triangle', width: 200, fill: '#FF0000' });
   });
 
   it('should catch on failure when object is not in canvas', async () => {
@@ -96,7 +96,7 @@ describe('Promise API', () => {
 
   it('should support Promise(addImageObject)', async () => {
     imageEditor._graphics.addImageObject = jest.fn(() => {
-      canvas.add(new fabric.Object());
+      canvas.add(new fabric.FabricObject());
 
       return Promise.resolve({ id: activeObjectId });
     });
@@ -154,7 +154,7 @@ describe('Promise API', () => {
 
     beforeEach(async () => {
       imageEditor._graphics.addImageObject = jest.fn(() => {
-        const obj = new fabric.Object({ width: 1, height: 1, strokeWidth: 0 });
+        const obj = new fabric.FabricObject({ width: 1, height: 1, strokeWidth: 0 });
         canvas.add(obj);
         activeObjectId = stamp(obj);
 

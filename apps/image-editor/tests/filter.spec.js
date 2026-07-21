@@ -1,4 +1,4 @@
-import { fabric } from 'fabric';
+import * as fabric from 'fabric';
 import Graphics from '@/graphics';
 import Filter from '@/component/filter';
 
@@ -9,7 +9,7 @@ describe('Filter', () => {
   const filter = new Filter(graphics);
 
   beforeEach(async () => {
-    const image = new fabric.Image(img);
+    const image = new fabric.FabricImage(img);
     jest.spyOn(image, 'applyFilters').mockReturnValue({});
     graphics.setCanvasImage('mockImage', image);
 

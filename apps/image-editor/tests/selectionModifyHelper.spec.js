@@ -1,4 +1,4 @@
-import { fabric } from 'fabric';
+import * as fabric from 'fabric';
 import Graphics from '@/graphics';
 import {
   setCachedUndoDataForDimension,
@@ -45,7 +45,8 @@ describe('selectionModifyHelper', () => {
 
       const result = makeSelectionUndoData(selection, (obj) => obj);
 
-      expect(result).toEqual([obj1, obj2]);
+      expect(result[0]).toBe(obj1);
+      expect(result[1]).toBe(obj2);
     });
   });
 

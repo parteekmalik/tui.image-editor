@@ -1,4 +1,4 @@
-import { fabric } from 'fabric';
+import * as fabric from 'fabric';
 import Graphics from '@/graphics';
 import Flip from '@/component/flip';
 
@@ -11,7 +11,7 @@ describe('Flip', () => {
   });
 
   beforeEach(() => {
-    mockImage = new fabric.Image();
+    mockImage = new fabric.FabricImage(document.createElement('canvas'));
     graphics.setCanvasImage('mockImage', mockImage);
   });
 

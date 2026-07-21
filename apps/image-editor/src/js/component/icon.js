@@ -1,4 +1,4 @@
-import { fabric } from 'fabric';
+import * as fabric from 'fabric';
 import extend from 'tui-code-snippet/object/extend';
 import forEach from 'tui-code-snippet/collection/forEach';
 import Component from '@/interface/component';
@@ -118,7 +118,6 @@ class Icon extends Component {
       icon.set(
         extend(
           {
-            type: 'icon',
             fill: this._oColor,
           },
           selectionStyle,
@@ -126,8 +125,17 @@ class Icon extends Component {
           this.graphics.controlStyle
         )
       );
+      icon.tuiType = 'icon';
 
-      canvas.add(icon).setActiveObject(icon);
+      const hasPosition =
+        options && (typeof options.left === 'number' || typeof options.top === 'number');
+      if (!hasPosition) {
+        const { x, y } = this.getCanvasImage().getCenterPoint();
+        icon.set({ left: x - icon.strokeWidth / 2, top: y - icon.strokeWidth / 2 });
+      }
+
+      canvas.add(icon);
+      canvas.setActiveObject(icon);
 
       resolve(this.graphics.createObjectProperties(icon));
     });
@@ -155,7 +163,7 @@ class Icon extends Component {
   setColor(color, obj) {
     this._oColor = color;
 
-    if (obj && obj.get('type') === 'icon') {
+    if (obj && obj.tuiType === 'icon') {
       obj.set({ fill: this._oColor });
       this.getCanvas().renderAll();
     }
@@ -187,7 +195,7 @@ class Icon extends Component {
   _onFabricMouseDown(fEvent) {
     const canvas = this.getCanvas();
 
-    this._startPoint = canvas.getPointer(fEvent.e);
+    this._startPoint = canvas.getScenePoint(fEvent.e);
     const { x: left, y: top } = this._startPoint;
 
     this.add(this._type, {
@@ -212,7 +220,7 @@ class Icon extends Component {
     if (!this._icon) {
       return;
     }
-    const moveOriginPointer = canvas.getPointer(fEvent.e);
+    const moveOriginPointer = canvas.getScenePoint(fEvent.e);
 
     const scaleX = (moveOriginPointer.x - this._startPoint.x) / this._icon.width;
     const scaleY = (moveOriginPointer.y - this._startPoint.y) / this._icon.height;
