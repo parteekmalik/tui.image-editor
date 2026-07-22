@@ -20,6 +20,7 @@
   ],
   "scripts": {
     "test": "jest --forceExit --detectOpenHandles",
+    "test:package-install": "node scripts/testPackageInstall.js",
     "test:browser": "playwright test --config=playwright.config.js",
     "test:browser:serve": "NODE_OPTIONS=--openssl-legacy-provider webpack serve --config webpack.browser.config.js",
     "test:types": "tsc --project tests/types",
@@ -49,8 +50,10 @@
     "last 2 versions",
     "not ie <= 9"
   ],
+  "devDependencies": {
+    "fabric": "^7.4.0"
+  },
   "dependencies": {
-    "fabric": "^7.4.0",
     "tui-code-snippet": "^2.3.3",
     "tui-color-picker": "^2.2.6"
   }
