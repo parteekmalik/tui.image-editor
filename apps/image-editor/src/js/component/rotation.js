@@ -65,7 +65,7 @@ class Rotation extends Component {
     canvas.forEachObject((obj) => {
       const objCenter = obj.getCenterPoint();
       const radian = fabric.util.degreesToRadians(angleDiff);
-      const newObjCenter = fabric.util.rotatePoint(objCenter, oldImageCenter, radian);
+      const newObjCenter = objCenter.rotate(radian, oldImageCenter);
 
       obj.set({
         left: newObjCenter.x - centerDiff.x,

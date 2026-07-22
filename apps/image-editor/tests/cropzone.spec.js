@@ -15,6 +15,8 @@ describe('Cropzone', () => {
     hasBorders: false,
     lockScalingFlip: true,
     lockRotation: true,
+    originX: 'left',
+    originY: 'top',
   };
   const canvas = new fabric.Canvas();
   canvas.height = 400;

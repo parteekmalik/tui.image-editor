@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout production branch
-        uses: actions/checkout@v2
+        uses: actions/checkout@v6
       - name: Check package version
         id: check
         uses: PostHog/check-package-version@v2
@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout production branch
-        uses: actions/checkout@v2
+        uses: actions/checkout@v6
       - name: Install dependencies
         id: cache-keys
         uses: ./.github/composite-actions/install-dependencies
@@ -39,7 +39,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout production branch
-        uses: actions/checkout@v2
+        uses: actions/checkout@v6
         with:
           ref: production
       - name: build
@@ -73,13 +73,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout production branch
-        uses: actions/checkout@v2
+        uses: actions/checkout@v6
         with:
           ref: production
-      - name: Use Node.js 15.x
-        uses: actions/setup-node@v1
+      - name: Use Node.js 22.x
+        uses: actions/setup-node@v6
         with:
-          node-version: '15.x'
+          node-version: '22.x'
           registry-url: https://registry.npmjs.org/
       - name: Get package version
         id: version
@@ -103,7 +103,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout production branch
-        uses: actions/checkout@v2
+        uses: actions/checkout@v6
         with:
           ref: production
       - name: Publish package
@@ -119,7 +119,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout production branch
-        uses: actions/checkout@v2
+        uses: actions/checkout@v6
         with:
           ref: production
       - name: Publish CDN
@@ -138,7 +138,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout production branch
-        uses: actions/checkout@v2
+        uses: actions/checkout@v6
         with:
           ref: production
       - name: Publish docs

@@ -65,3 +65,13 @@ cloning, explicit free-drawing brushes, and the new pointer, stack, selection, a
 APIs. The editor keeps its existing lowercase public object types while Fabric uses its
 new internal class names. Jest, browser, type, lint, format, and production build checks
 pass. Manual Brezel validation and publishing remain before starting Fabric 7.
+
+## Fabric 7 status
+
+The core image editor is upgraded to Fabric 7.4.0 and now requires Node 20 or newer.
+The migration preserves the editor's left/top positioning, primary-click behavior, and
+legacy object stacking defaults, replaces the removed point rotation helper, and moves
+all GitHub workflows to Node 22 and the current GitHub Actions runtime. The obsolete
+external Selenium runtime-error workflow is replaced by the maintained Playwright gate.
+Jest, browser, type, lint, format, and production build checks pass. Manual Brezel
+validation remains before publishing.

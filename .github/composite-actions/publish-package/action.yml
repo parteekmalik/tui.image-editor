@@ -13,13 +13,13 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: Use Node.js 15.x
-      uses: actions/setup-node@v1
+    - name: Use Node.js 22.x
+      uses: actions/setup-node@v6
       with:
-        node-version: '15.x'
+        node-version: '22.x'
         registry-url: https://registry.npmjs.org/
     - name: Checkout production branch
-      uses: actions/checkout@v2
+      uses: actions/checkout@v6
       with:
         ref: production
     - name: Check root dependencies cache

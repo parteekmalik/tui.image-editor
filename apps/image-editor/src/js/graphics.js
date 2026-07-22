@@ -959,6 +959,8 @@ class Graphics {
    */
   _setObjectCachingToFalse() {
     fabric.FabricObject.ownDefaults.objectCaching = false;
+    fabric.FabricObject.ownDefaults.originX = 'left';
+    fabric.FabricObject.ownDefaults.originY = 'top';
   }
 
   /**
@@ -984,6 +986,10 @@ class Graphics {
     this._canvas = new fabric.Canvas(canvasElement, {
       containerClass: 'tui-image-editor-canvas-container',
       enableRetinaScaling: false,
+      fireMiddleClick: false,
+      fireRightClick: false,
+      preserveObjectStacking: false,
+      stopContextMenu: false,
     });
     this._canvas.freeDrawingBrush = new fabric.PencilBrush(this._canvas);
   }
