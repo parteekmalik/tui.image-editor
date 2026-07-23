@@ -1,3 +1,7 @@
+> # Maintenance Note:
+> This is maintained over at https://github.com/brezelio/tui.image-editor!
+
+
 # TOAST UI Image Editor - Fabric 7 fork
 
 This repository is a maintained fork of
